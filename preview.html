@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wenxin Li | Product Designer — Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a1a1a;
+      --secondary: #6b7280;
+      --accent: #7c6cad;
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: var(--primary);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--accent); color: white; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 3px; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(245,245,245,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem;
+      color: var(--accent); text-decoration: none; letter-spacing: -0.02em;
+    }
+    .logo:hover { opacity: 0.8; }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a, .nav-links .dropdown-trigger {
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--secondary); text-decoration: none;
+      transition: color 0.2s; cursor: pointer; background: none; border: none;
+      font-family: inherit;
+    }
+    .nav-links a:hover, .nav-links .dropdown-trigger:hover { color: var(--primary); }
+    .nav-links .active { color: var(--primary); font-weight: 600; }
+    .dropdown { position: relative; }
+    .dropdown-menu {
+      display: none; position: absolute; top: 100%; left: 0; padding-top: 0.5rem;
+    }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu-inner {
+      background: var(--surface); border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05);
+      padding: 0.5rem 0; min-width: 180px;
+    }
+    .dropdown-menu a {
+      display: block; padding: 0.6rem 1rem; font-size: 0.85rem;
+      text-transform: none; letter-spacing: 0;
+    }
+    .dropdown-menu a:hover { background: var(--bg); }
+
+    /* LAYOUT */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .section { padding: 4rem 0; }
+    hr { border: none; border-top: 1px solid rgba(0,0,0,0.08); }
+
+    /* HERO */
+    .hero { padding: 4rem 0 5rem; }
+    .avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(124,108,173,0.15), rgba(124,108,173,0.05));
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 2rem; font-size: 2.5rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.15; letter-spacing: -0.02em; max-width: 720px;
+    }
+    .hero h1 .light { color: var(--secondary); }
+    .hero h1 .bold {
+      color: var(--primary); font-weight: 600; position: relative; display: inline;
+    }
+    .hero h1 .bold::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 2px; background: var(--primary);
+    }
+
+    /* CASE STUDY CARD */
+    .card {
+      background: var(--surface); border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.04);
+      transition: all 0.3s ease;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      text-decoration: none; color: inherit;
+    }
+    .card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+      transform: translateY(-4px);
+    }
+    .card-text { padding: 3rem; display: flex; flex-direction: column; justify-content: center; }
+    .card-tags { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; align-items: center; }
+    .card-tags span { font-size: 0.85rem; color: var(--secondary); }
+    .card-tags .sep { color: rgba(107,114,128,0.3); }
+    .card h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem;
+      font-weight: 600; color: rgba(26,26,26,0.7); margin-bottom: 1rem; line-height: 1.3;
+    }
+    .card p { color: var(--secondary); line-height: 1.7; margin-bottom: 1.5rem; font-size: 0.95rem; }
+    .card-awards { margin-bottom: 1.5rem; }
+    .card-awards p { font-size: 0.85rem; color: var(--secondary); margin-bottom: 0.25rem; }
+    .card-awards .label { font-weight: 600; font-style: italic; }
+    .card-link {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.85rem; font-weight: 600; color: var(--primary);
+      transition: color 0.2s;
+    }
+    .card:hover .card-link { color: var(--accent); }
+    .card-link svg { width: 16px; height: 16px; transition: transform 0.2s; }
+    .card:hover .card-link svg { transform: translateX(3px); }
+    .card-image {
+      background: var(--bg); display: flex; align-items: center;
+      justify-content: center; padding: 1.5rem; min-height: 300px;
+    }
+    .card-image .placeholder {
+      width: 100%; height: 100%; min-height: 250px; border-radius: 8px;
+      background: linear-gradient(135deg, #e0e0e0, #c8c8c8);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--secondary); font-size: 0.85rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* SKILLS */
+    .skills-intro {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem;
+      color: var(--secondary); margin-bottom: 2rem; max-width: 520px;
+    }
+    .skills-intro a { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+    .skills-intro a:hover { opacity: 0.8; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+    .skills-grid span { font-size: 1.3rem; font-weight: 600; color: rgba(26,26,26,0.8); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid rgba(0,0,0,0.08); margin-top: 6rem; }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto; padding: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left { display: flex; align-items: center; gap: 0.5rem; }
+    .footer-left .w { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--accent); font-style: italic; }
+    .footer-left span { font-size: 0.85rem; color: var(--secondary); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: 0.8rem; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--secondary); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--primary); }
+
+    /* PAGE INDICATOR */
+    .page-nav {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--primary); color: white; padding: 0.5rem 1.5rem;
+      border-radius: 999px; font-size: 0.75rem; font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 100;
+      display: flex; gap: 1rem; align-items: center;
+    }
+    .page-nav a {
+      color: rgba(255,255,255,0.6); text-decoration: none;
+      transition: color 0.2s; padding: 0.25rem 0.5rem;
+    }
+    .page-nav a:hover, .page-nav a.active { color: white; }
+
+    /* ABOUT PAGE */
+    .about-photo {
+      width: 100%; max-width: 560px; aspect-ratio: 3/4; border-radius: 12px;
+      overflow: hidden; margin-left: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+    .about-photo .placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #87CEEB, #6495ED);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.2rem; font-weight: 500;
+    }
+    .highlights-grid { display: grid; grid-template-columns: 280px 1fr; gap: 4rem; }
+    .highlights-grid h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600; }
+    .highlights-list p { margin-bottom: 1rem; color: rgba(26,26,26,0.8); line-height: 1.7; }
+    .companies-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .company-logo {
+      height: 64px; width: 140px; background: var(--surface); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: 600;
+      color: var(--secondary);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .card { grid-template-columns: 1fr; }
+      .highlights-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .nav-links { display: none; }
+      .page-nav { gap: 0.5rem; font-size: 0.65rem; padding: 0.4rem 1rem; }
+    }
+
+    /* ANIMATION */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.6s ease-out both; }
+    .fade-up-d1 { animation-delay: 0.1s; }
+    .fade-up-d2 { animation-delay: 0.2s; }
+    .fade-up-d3 { animation-delay: 0.3s; }
+    .fade-up-d4 { animation-delay: 0.4s; }
+
+    /* HIDE SECTIONS */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo" onclick="showPage('home')"><em>W</em>enxin Li</a>
+      <div class="nav-links">
+        <div class="dropdown">
+          <button class="dropdown-trigger" id="nav-case">Case Study</button>
+          <div class="dropdown-menu">
+            <div class="dropdown-menu-inner">
+              <a href="#" onclick="showPage('sanctify')">Sanctify</a>
+              <a href="#" onclick="showPage('opusclip')">Opus Clip</a>
+              <a href="#" onclick="showPage('drayeasy')">DrayEasy</a>
+            </div>
+          </div>
+        </div>
+        <a href="#" onclick="showPage('play')" id="nav-play">Play</a>
+        <a href="#" onclick="showPage('about')" id="nav-about">About</a>
+        <a href="#" id="nav-resume">Resume</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- FLOATING NAV -->
+  <div class="page-nav">
+    <a href="#" onclick="showPage('home')" class="active" id="dot-home">Home</a>
+    <a href="#" onclick="showPage('sanctify')" id="dot-sanctify">Sanctify</a>
+    <a href="#" onclick="showPage('opusclip')" id="dot-opusclip">Opus Clip</a>
+    <a href="#" onclick="showPage('drayeasy')" id="dot-drayeasy">DrayEasy</a>
+    <a href="#" onclick="showPage('play')" id="dot-play">Play</a>
+    <a href="#" onclick="showPage('about')" id="dot-about">About</a>
+  </div>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page-section active" id="page-home">
+    <div class="container">
+      <section class="hero">
+        <div class="avatar fade-up">&#x1F469;&#x200D;&#x1F4BB;</div>
+        <h1 class="fade-up fade-up-d1">
+          <span class="light">Wenxin is an award-winning product designer and she designs</span>
+          <span class="bold">next-gen smart screens</span><span class="light">.</span>
+        </h1>
+      </section>
+      <hr>
+    </div>
+
+    <!-- Case Study Cards -->
+    <div class="container section" style="display:flex;flex-direction:column;gap:2rem;">
+
+      <!-- Sanctify -->
+      <a href="#" class="card fade-up fade-up-d2" onclick="showPage('sanctify')">
+        <div class="card-text">
+          <div class="card-tags">
+            <span>B2C Fintech</span><span class="sep">---</span><span>Mobile App</span>
+          </div>
+          <h3>Sanctify - Investment in Good Faith</h3>
+          <p>Launching a trustworthy and delightful onboarding experience for investors make well-informed decisions in line with Catholic values.</p>
+          <div class="card-awards">
+            <p><span class="label">Winner</span> | 2023 Red Dot - Design Concept (NDA)</p>
+            <p><span class="label">Finalist</span> | 2023 iF Design Awards</p>
+          </div>
+          <div class="card-link">
+            View project
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+        <div class="card-image">
+          <div class="placeholder">Sanctify App Preview<br>(add sanctify-preview.jpg)</div>
+        </div>
+      </a>
+
+      <!-- Opus Clip -->
+      <a href="#" class="card fade-up fade-up-d3" onclick="showPage('opusclip')">
+        <div class="card-text">
+          <div class="card-tags">
+            <span>B2C AIGC</span><span class="sep">---</span><span>Dashboard</span>
+          </div>
+          <h3>Opus Clip - AI Content Optimization Tool</h3>
+          <p>Help users understand their video performance and create popular videos with AI assistance.</p>
+          <div class="card-link">
+            View project
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+        <div class="card-image">
+          <div class="placeholder">Opus Clip Dashboard<br>(add opusclip-preview.jpg)</div>
+        </div>
+      </a>
+
+      <!-- DrayEasy -->
+      <a href="#" class="card fade-up fade-up-d4" onclick="showPage('drayeasy')">
+        <div class="card-text">
+          <div class="card-tags">
+            <span>B2B SaaS</span><span class="sep">---</span><span>Web</span>
+          </div>
+          <h3>DrayEasy - Make your drayage easier</h3>
+          <p>Revamping the web platform and empowering freight agent's logistic journey with instant quotes.</p>
+          <div class="card-link">
+            View project
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+        </div>
+        <div class="card-image">
+          <div class="placeholder">DrayEasy Platform<br>(add drayeasy-preview.jpg)</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="container"><hr></div>
+
+    <!-- Skills -->
+    <div class="container section">
+      <p class="skills-intro">Click below. See more of my <a href="#" onclick="showPage('play')">transferrable skills</a></p>
+      <div class="skills-grid">
+        <span>User Centered Approach</span>
+        <span>Sustainability and Accessibility</span>
+        <span>Creative Problem Solving</span>
+        <span>Systems Thinking</span>
+        <span>Research and Analysis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT PAGE ===== -->
+  <div class="page-section" id="page-about">
+    <div class="container section">
+      <div class="about-photo">
+        <div class="placeholder">Your Photo<br>(add about-photo.jpg)</div>
+      </div>
+    </div>
+    <div class="container section">
+      <div class="highlights-grid">
+        <h2>Highlights</h2>
+        <div class="highlights-list">
+          <p>- <strong>4+ years of professional design experience</strong>, including two years as a product designer and two years with a background in landscape architecture and urban design.</p>
+          <p>- Previously launched <strong>B2B SaaS and B2C Fintech</strong> products from scratch.</p>
+          <p>- Won <strong>Red Dot and iF design awards</strong>, as well as landscape and urban design awards from BSLA and SCUP.</p>
+          <p>- Graduated with a Master's degree in Design from the <strong>Rhode Island School of Design (RISD)</strong> in 2019.</p>
+        </div>
+      </div>
+    </div>
+    <div class="container section">
+      <div class="highlights-grid">
+        <h2>Companies/<br>Organizations<br>I've worked with</h2>
+        <div class="companies-grid">
+          <div class="company-logo">Opus Clip</div>
+          <div class="company-logo">DrayEasy</div>
+          <div class="company-logo">IWP Capital</div>
+          <div class="company-logo">Sasaki</div>
+          <div class="company-logo">RISD</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SANCTIFY PAGE ===== -->
+  <div class="page-section" id="page-sanctify">
+    <div class="container section">
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(3rem,6vw,4.5rem);font-weight:700;letter-spacing:-0.02em;margin-bottom:1.5rem;">Sanctify</h1>
+      <p style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--secondary);line-height:1.5;max-width:800px;margin-bottom:1.5rem;">Launching a convenient and delightful investment app that lets you make well-informed decisions in line with Catholic values.</p>
+      <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;">
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">B2C Fintech</span>
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">Award winning</span>
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">Launched in 2023</span>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;border:1px solid rgba(0,0,0,0.04);padding:1.5rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:3rem;">
+        <div><p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--secondary);margin-bottom:0.25rem;">Role</p><p style="font-size:0.85rem;font-weight:500;">UX Designer</p></div>
+        <div><p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--secondary);margin-bottom:0.25rem;">Timeline</p><p style="font-size:0.85rem;font-weight:500;">Jul-Nov 2022 (18 wks)</p></div>
+        <div><p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--secondary);margin-bottom:0.25rem;">Client</p><p style="font-size:0.85rem;font-weight:500;">IWP Capital</p></div>
+        <div><p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--secondary);margin-bottom:0.25rem;">Tools</p><p style="font-size:0.85rem;font-weight:500;">Figma, Illustrator</p></div>
+      </div>
+      <div style="background:rgba(124,108,173,0.06);border-radius:12px;padding:1.5rem;margin-bottom:3rem;">
+        <p style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:600;color:var(--accent);margin-bottom:0.5rem;">Meaningful impact</p>
+        <p>We saved <strong>40%</strong> of the drop-off rate. Over <strong>20,000</strong> new users signed up for the waitlist.</p>
+      </div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:1rem;">Overview</h2>
+      <p style="color:rgba(26,26,26,0.8);line-height:1.8;margin-bottom:2rem;">Sanctify is an investing app that lets you screen companies for alignment with Catholic values, build & invest in portfolios, and join a community of like-minded investors striving to promote the common good. As a UX designer, I participated in research, ideation, user flow, and wireframe processes with four other designers, primarily designing the app's homepage.</p>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:1rem;">Research Insights</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+        <div style="background:var(--surface);padding:1.25rem;border-radius:12px;border:1px solid rgba(0,0,0,0.04);"><p style="font-weight:600;color:var(--accent);margin-bottom:0.25rem;">01</p><p style="font-weight:600;margin-bottom:0.25rem;">Catholic value</p><p style="font-size:0.85rem;color:var(--secondary);">A Catholic investing app gives users immediate trust.</p></div>
+        <div style="background:var(--surface);padding:1.25rem;border-radius:12px;border:1px solid rgba(0,0,0,0.04);"><p style="font-weight:600;color:var(--accent);margin-bottom:0.25rem;">02</p><p style="font-weight:600;margin-bottom:0.25rem;">Display updates</p><p style="font-size:0.85rem;color:var(--secondary);">Users will create an account and follow if there's motivation triggers.</p></div>
+        <div style="background:var(--surface);padding:1.25rem;border-radius:12px;border:1px solid rgba(0,0,0,0.04);"><p style="font-weight:600;color:var(--accent);margin-bottom:0.25rem;">03</p><p style="font-weight:600;margin-bottom:0.25rem;">Financial guidance</p><p style="font-size:0.85rem;color:var(--secondary);">Users want professional help on which companies to invest in.</p></div>
+      </div>
+      <p style="font-style:italic;color:var(--secondary);border-left:4px solid var(--accent);padding-left:1rem;margin-bottom:2rem;">"How might we design an informative, convenient and delightful mobile experience for users, where they can do purpose investing and screening?"</p>
+      <p style="color:rgba(26,26,26,0.8);line-height:1.8;">Full case study content available in the Next.js project. Add your project images to the public/images/ folder to see the complete presentation.</p>
+    </div>
+  </div>
+
+  <!-- ===== OPUS CLIP PAGE ===== -->
+  <div class="page-section" id="page-opusclip">
+    <div class="container section">
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(3rem,6vw,4.5rem);font-weight:700;margin-bottom:1.5rem;">Opus Clip</h1>
+      <p style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--secondary);line-height:1.5;max-width:800px;margin-bottom:2rem;">Help users understand their video performance and create popular videos with AI assistance.</p>
+      <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;">
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">B2C AIGC</span>
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">Dashboard</span>
+      </div>
+      <p style="color:rgba(26,26,26,0.8);line-height:1.8;">Full case study content available in the Next.js project. Add your project images to see the complete presentation.</p>
+    </div>
+  </div>
+
+  <!-- ===== DRAYEASY PAGE ===== -->
+  <div class="page-section" id="page-drayeasy">
+    <div class="container section">
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(3rem,6vw,4.5rem);font-weight:700;margin-bottom:1.5rem;">DrayEasy</h1>
+      <p style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--secondary);line-height:1.5;max-width:800px;margin-bottom:2rem;">Revamping the web platform and empowering freight agent's logistic journey with instant quotes.</p>
+      <div style="display:flex;gap:0.75rem;margin-bottom:2.5rem;">
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">B2B SaaS</span>
+        <span style="padding:0.4rem 1rem;border:1px solid rgba(0,0,0,0.12);border-radius:999px;font-size:0.85rem;color:var(--secondary);">Web Platform</span>
+      </div>
+      <p style="color:rgba(26,26,26,0.8);line-height:1.8;">Full case study content available in the Next.js project. Add your project images to see the complete presentation.</p>
+    </div>
+  </div>
+
+  <!-- ===== PLAY PAGE ===== -->
+  <div class="page-section" id="page-play">
+    <div class="container section">
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);max-width:720px;line-height:1.3;margin-bottom:1rem;">
+        <span style="color:var(--secondary);font-style:italic;">I also design, research & paint </span>
+        <strong>places</strong>
+      </h1>
+      <p style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--secondary);">where you feel a <strong style="color:var(--primary);">presence</strong>.</p>
+      <p style="color:var(--secondary);margin-top:1rem;font-size:1.05rem;">Uncover the <strong>perception</strong> and <strong>physicality</strong> of space by generating visualized mapping, data, model, artwork, and more.</p>
+    </div>
+    <div class="container" style="display:flex;flex-direction:column;gap:4rem;padding-bottom:4rem;">
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:3rem;">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">Changchun Middle Mt. Framework Plan</h2>
+          <p style="font-size:0.85rem;color:var(--secondary);margin-bottom:0.25rem;">Work done at Sasaki</p>
+          <p style="font-size:0.85rem;color:var(--accent);font-weight:500;">Honor | 2023 BSLA</p>
+        </div>
+        <div style="aspect-ratio:16/10;background:linear-gradient(135deg,#90EE90,#3CB371);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:500;">Changchun Landscape (add play-changchun.jpg)</div>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:3rem;">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">Perceptual Physicality of Space & Color</h2>
+          <p style="font-size:0.85rem;color:var(--secondary);">Work done at RISD</p>
+        </div>
+        <div style="aspect-ratio:16/10;background:linear-gradient(135deg,#FF6B6B,#FFB84D);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:500;">Perception Artwork (add play-perception.jpg)</div>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:3rem;">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">Recording the Chinese Historical Landscape</h2>
+          <p style="font-size:0.85rem;color:var(--secondary);">Work done at Nanjing Forestry University</p>
+        </div>
+        <div style="aspect-ratio:16/10;background:linear-gradient(135deg,#8B7355,#D2B48C);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-weight:500;">Chinese Landscape (add play-chinese-landscape.jpg)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="w">W</span>
+        <span>All rights reserved</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.linkedin.com/in/wenxin-li-design" target="_blank">LinkedIn</a>
+        <a href="mailto:wli@antigma.ai">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function showPage(page) {
+      // Hide all pages
+      document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+      // Show target page
+      document.getElementById('page-' + page).classList.add('active');
+      // Update nav dots
+      document.querySelectorAll('.page-nav a').forEach(a => a.classList.remove('active'));
+      const dot = document.getElementById('dot-' + page);
+      if (dot) dot.classList.add('active');
+      // Scroll to top
+      window.scrollTo(0, 0);
+      return false;
+    }
+  </script>
+
+</body>
+</html>
