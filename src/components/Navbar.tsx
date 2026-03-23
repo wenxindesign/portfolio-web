@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -18,11 +19,14 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-black/5">
-      <div className="max-w-content mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-50 bg-background/40 backdrop-blur-sm border-b border-black/5">
+      <div className="w-full px-6 lg:px-24 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link href="/" className="font-display text-2xl tracking-tight text-accent hover:opacity-80 transition-opacity">
-          <span className="italic">W</span>enxin Li
+        <Link href="/" className="hover:opacity-80 transition-opacity">
+          <span className="text-2xl font-semibold" style={{ fontFamily: "'Caveat', cursive" }}>
+            <span className="text-accent/70 text-3xl">W</span>
+            <span className="text-primary">enxin Li</span>
+          </span>
         </Link>
 
         {/* Desktop Nav */}
@@ -38,7 +42,7 @@ export default function Navbar() {
                 pathname.startsWith("/work") ? "text-primary font-semibold" : "text-secondary"
               }`}
             >
-              Case Study
+              CASE STUDY
             </button>
             {caseStudyOpen && (
               <div className="absolute top-full left-0 pt-2">

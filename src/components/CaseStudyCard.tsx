@@ -25,11 +25,11 @@ export default function CaseStudyCard({
   return (
     <Link href={href} className="group block">
       <div className="bg-surface rounded-2xl overflow-hidden border border-black/5 transition-all duration-300 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:h-[400px]">
           {/* Text Content */}
-          <div className="p-8 lg:p-12 flex flex-col justify-center">
+          <div className="p-8 lg:p-10 flex flex-col justify-center overflow-hidden">
             {/* Tags */}
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-3">
               {tags.map((tag, i) => (
                 <span key={i}>
                   {i > 0 && <span className="text-secondary/40 mr-3">---</span>}
@@ -39,18 +39,18 @@ export default function CaseStudyCard({
             </div>
 
             {/* Title */}
-            <h3 className="font-display text-2xl lg:text-3xl font-semibold text-primary/70 mb-4 leading-tight">
+            <h3 className="font-thicccboi text-2xl lg:text-[1.7rem] font-semibold text-primary tracking-[-0.02em] mb-3 leading-tight">
               {title}
             </h3>
 
             {/* Description */}
-            <p className="text-secondary text-base leading-relaxed mb-6">
+            <p className="text-primary text-sm leading-relaxed mb-4">
               {description}
             </p>
 
             {/* Awards */}
             {awards && awards.length > 0 && (
-              <div className="mb-6 space-y-1">
+              <div className="mb-4 space-y-1">
                 {awards.map((award, i) => (
                   <p key={i} className="text-sm text-secondary">
                     <span className="font-semibold italic">{award.split("|")[0].trim()}</span>

@@ -13,7 +13,7 @@ const projects = [
     tags: ["Hybrid Mapping", "GIS Calculating", "Data Visualize"],
     description:
       "This image depicts the overall vision for the Changchun Middle Water Landscape Master Plan. Through GIS research and ecological analysis, we aim to reconnect fragmented landscapes using landscape ecological restoration methods, injecting vitality into the landscape.",
-    image: "/images/play-changchun.jpg",
+    image: "/images/play/changchun.jpg",
   },
   {
     title: "Perceptual Physicality of Space & Color",
@@ -22,7 +22,7 @@ const projects = [
     tags: ["Research on Cognitive Science"],
     description:
       'This artwork captures the breathtaking essence of the subject. Utilizing metrics to delve into cognition via phenomenology, spatial concepts, art, and perceptual psychology, this map presents a comprehensive understanding of vitality, relationships, and essence.',
-    image: "/images/play-perception.jpg",
+    image: "/images/play/perception-1.jpg",
   },
   {
     title: "Recording the Chinese Historical Landscape",
@@ -31,7 +31,7 @@ const projects = [
     tags: ["The Initial of My Story: Painting"],
     description:
       "In 2014, I used a syringe pen to capture corners of classical gardens. Since then, I\u2019ve gradually begun to sense the power that time bestows upon space. The activities of people within historical events, and the events they generate, in turn, endow time with meaning.",
-    image: "/images/play-chinese-landscape.jpg",
+    image: "/images/play/chinese-landscape.jpg",
   },
 ];
 
@@ -39,12 +39,12 @@ export default function PlayPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pt-16 pb-20">
-        <h1 className="font-display text-3xl md:text-4xl lg:text-5xl leading-snug max-w-3xl">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-16 pb-20">
+        <h1 className="font-thicccboi text-3xl md:text-4xl lg:text-5xl leading-snug max-w-3xl tracking-[-0.02em]">
           <span className="text-secondary italic">I also design, research & paint </span>
           <span className="text-primary font-bold">places</span>
         </h1>
-        <p className="font-display text-2xl md:text-3xl lg:text-4xl text-secondary mt-2">
+        <p className="font-thicccboi text-2xl md:text-3xl lg:text-4xl text-secondary tracking-[-0.02em] mt-2">
           where you feel a <span className="text-primary font-bold">presence</span>.
         </p>
         <p className="text-secondary mt-4 max-w-3xl text-lg">
@@ -53,12 +53,12 @@ export default function PlayPage() {
       </section>
 
       {/* Projects */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pb-16 space-y-20">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pb-16 space-y-20">
         {projects.map((project, i) => (
           <div key={i} className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 lg:gap-12">
             {/* Left: Info */}
             <div>
-              <h2 className="font-display text-2xl font-bold mb-2">{project.title}</h2>
+              <h2 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">{project.title}</h2>
               <p className="text-sm text-secondary mb-1">{project.subtitle}</p>
               {project.award && (
                 <p className="text-sm text-accent font-medium mb-3">{project.award}</p>
@@ -88,8 +88,8 @@ export default function PlayPage() {
       </section>
 
       {/* End */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 py-16 text-center">
-        <p className="font-display text-2xl text-secondary">The End</p>
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] py-16 text-center">
+        <p className="font-thicccboi text-2xl text-secondary tracking-[-0.02em]">The End</p>
         <p className="text-secondary mt-2">Thanks for Reading.</p>
       </section>
     </div>

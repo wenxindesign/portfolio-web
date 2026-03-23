@@ -11,10 +11,11 @@ function SectionText({ children }: { children: React.ReactNode }) {
 }
 
 function SectionImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  const isGif = src.toLowerCase().endsWith('.gif');
   return (
     <figure className="my-8">
       <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-surface border border-black/5">
-        <Image src={src} alt={alt} fill className="object-contain" sizes="800px" />
+        <Image src={src} alt={alt} fill className="object-contain" sizes="800px" unoptimized={isGif} />
       </div>
       {caption && <figcaption className="mt-2 text-sm text-secondary text-center">{caption}</figcaption>}
     </figure>
@@ -45,7 +46,7 @@ const sections = [
         <p><strong>My role</strong></p>
         <p>I participated in the research, ideation, user flow, and wireframe processes with four other designers. I primarily designed the app&apos;s homepage. During the design process, I worked closely with the client&apos;s representatives to continuously update and iterate on the product.</p>
         <div className="bg-accent/5 rounded-xl p-6 my-6">
-          <p className="font-display text-xl font-semibold text-accent mb-2">Meaningful impact</p>
+          <p className="font-thicccboi text-xl font-medium tracking-[-0.02em] text-accent mb-2">Meaningful impact</p>
           <p>We saved <strong>40%</strong> of the drop-off rate.</p>
           <p>Over <strong>20,000</strong> new users have signed up to join the waitlist.</p>
         </div>
@@ -59,13 +60,13 @@ const sections = [
       <SectionText>
         <p><strong>Obtaining the latest faith-based categories and sustainable stock information</strong></p>
         <p>Users can view news on democratized, faith-based ESG sustainable investing, which empowers retail investors to align their investments with personal values and religious convictions.</p>
-        <SectionImage src="/images/sanctify-feature-1.jpg" alt="FFV Scorecard feature" />
+        <SectionImage src="/images/sanctify/feature-1.png" alt="FFV Scorecard feature" />
         <p><strong>Screening for MVP through FFV scorecard</strong></p>
         <p>We empower users to make informed faith-based ESG investments independently. Using our exclusive screening process, they have the ability to evaluate over 20,000 securities.</p>
-        <SectionImage src="/images/sanctify-feature-2.jpg" alt="Screening feature" />
+        <SectionImage src="/images/sanctify/feature-2.png" alt="Screening feature" />
         <p><strong>Getting on-board with trustworthy guidance</strong></p>
         <p>The app&apos;s simplicity and transparent guided experience help users make investment decisions that align with their faith.</p>
-        <SectionImage src="/images/sanctify-feature-3.jpg" alt="Onboarding experience" />
+        <SectionImage src="/images/sanctify/Feature-3-Getting on-board.png" alt="Onboarding experience" />
       </SectionText>
     ),
   },
@@ -76,6 +77,7 @@ const sections = [
       <SectionText>
         <p><strong>Who are the users?</strong></p>
         <p>In meetings with stakeholders, we discovered that our target audience — U.S. Catholics and Catholic institutions — constitutes a significant portion of U.S. investors.</p>
+        <SectionImage src="/images/sanctify/Users.png" alt="Target user demographics" />
         <p><strong>What are the user profiles and needs?</strong></p>
         <p>To get deep insights of Catholic investment habits, goals and preferences, we interviewed five participants and generated 3 user profiles.</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
@@ -95,7 +97,8 @@ const sections = [
             <p className="text-sm text-secondary">Users would like professional help or guidance on which companies to invest in.</p>
           </div>
         </div>
-        <SectionImage src="/images/sanctify-research.jpg" alt="User research findings" />
+        <SectionImage src="/images/sanctify/Personas.png" alt="User personas" />
+        <SectionImage src="/images/sanctify/Personas-1.png" alt="User personas details" />
       </SectionText>
     ),
   },
@@ -109,6 +112,7 @@ const sections = [
         <blockquote className="border-l-4 border-accent pl-4 my-4 text-secondary italic">
           How might we design an informative, convenient and delightful mobile experience for users, where they can do purpose investing and screening?
         </blockquote>
+        <SectionImage src="/images/sanctify/Goal.png" alt="Design goals" />
         <p><strong>Learn from mainstream investment apps</strong></p>
         <p>We examined six well-known investment apps, like Robinhood, Stash, and Ellevest. Key features we learned:</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
@@ -128,6 +132,7 @@ const sections = [
             <p className="text-sm text-secondary">Bright colors and illustrations to increase user engagement.</p>
           </div>
         </div>
+        <SectionImage src="/images/sanctify/Competitive Analysis.png" alt="Competitive analysis of investment apps" />
       </SectionText>
     ),
   },
@@ -138,9 +143,12 @@ const sections = [
       <SectionText>
         <p><strong>Start from key path scenarios</strong></p>
         <p>The initial stage involved developing core path scenarios with screening steps. This enabled us to move quickly through wireframing and information architecture.</p>
-        <SectionImage src="/images/sanctify-architecture.jpg" alt="Information architecture diagram" />
+        <SectionImage src="/images/sanctify/Kay path scenarios.png" alt="Key path scenarios" />
         <p><strong>Complete picture of the product</strong></p>
         <p>We held workshops to discuss and build the information architecture, generating the big picture of the flow including screening and related functions on each page.</p>
+        <SectionImage src="/images/sanctify/IA.png" alt="Information architecture diagram" />
+        <SectionImage src="/images/sanctify/Userflow.png" alt="User flow diagram" />
+        <SectionImage src="/images/sanctify/Homepage User Flow.png" alt="Homepage user flow" />
       </SectionText>
     ),
   },
@@ -154,9 +162,11 @@ const sections = [
         <p>1. What information sections need to be displayed?</p>
         <p>2. How to embed faith-based features into sections?</p>
         <p>3. How to provide a delightful and informative user experience?</p>
-        <SectionImage src="/images/sanctify-wireframe.jpg" alt="Wireframe explorations" caption="Wireframe exploration - aligning user needs with business value" />
-        <SectionImage src="/images/sanctify-midfi.jpg" alt="Mid-fidelity designs" caption="Mid-fi exploration - testing different visual effects with green and white space" />
-        <SectionImage src="/images/sanctify-hifi.jpg" alt="High-fidelity designs" caption="High-fi exploration with two rounds of user testing" />
+        <SectionImage src="/images/sanctify/Wireframe exploration-1.png" alt="Wireframe explorations" caption="Wireframe exploration - aligning user needs with business value" />
+        <SectionImage src="/images/sanctify/Wireframe exploration-2.png" alt="Wireframe explorations continued" caption="Further wireframe iterations" />
+        <SectionImage src="/images/sanctify/Mid-fi.png" alt="Mid-fidelity designs" caption="Mid-fi exploration - testing different visual effects with green and white space" />
+        <SectionImage src="/images/sanctify/Final.png" alt="High-fidelity designs" caption="High-fi exploration with two rounds of user testing" />
+        <SectionImage src="/images/sanctify/Final-2.png" alt="Final high-fidelity designs" caption="Refined final designs" />
       </SectionText>
     ),
   },
@@ -165,16 +175,19 @@ const sections = [
     title: "Final Solutions",
     content: (
       <SectionText>
-        <p className="font-display text-xl font-semibold">Home as a versatile and personalized hub</p>
+        <p className="font-thicccboi text-xl font-medium tracking-[-0.02em]">Home as a versatile and personalized hub</p>
         <p className="font-semibold mt-6">From uncandid to informative</p>
         <p>50% of users were unsure how screening works. We proposed transparent screen reports, smart collections under FFV scorecard, and browsing through FFV score card collections.</p>
-        <SectionImage src="/images/sanctify-solution-1.jpg" alt="Transparent screen reports" />
+        <SectionImage src="/images/sanctify/1_Screen_reports_3.gif" alt="Screen reports solution" />
         <p className="font-semibold mt-6">From complicated to convenient</p>
         <p>We designed a convenient and quick login process, and incorporated popular market movers for easy investment channels.</p>
-        <SectionImage src="/images/sanctify-solution-2.jpg" alt="Simplified onboarding" />
+        <SectionImage src="/images/sanctify/2_Colelction.gif" alt="Collection and convenience solution" />
+        <SectionImage src="/images/sanctify/4_Market_Mover.gif" alt="Market movers feature" />
         <p className="font-semibold mt-6">From boring to delightful</p>
         <p>Enjoy a delightful onboarding experience with appealing illustrations, leaving a positive, relaxing and professional impression.</p>
-        <SectionImage src="/images/sanctify-solution-3.jpg" alt="Delightful illustrations" />
+        <SectionImage src="/images/sanctify/3_Welcomeback.gif" alt="Welcome back experience" />
+        <SectionImage src="/images/sanctify/5_New_1.gif" alt="New user onboarding" />
+        <SectionImage src="/images/sanctify/6_getting.gif" alt="Getting started experience" />
       </SectionText>
     ),
   },
@@ -185,7 +198,10 @@ const sections = [
       <SectionText>
         <p>Using illustrations was one of the primary approaches to develop this app. We created and promoted a positive, just, and non-addictive investing environment aligned with the moral values of the business.</p>
         <p>We chose green as the primary color to symbolize growth, health, and the promotion of social and moral responsibilities.</p>
-        <SectionImage src="/images/sanctify-branding.jpg" alt="Design system and branding" />
+        <SectionImage src="/images/sanctify/Illustrative-1.png" alt="Illustrative design system" />
+        <SectionImage src="/images/sanctify/Illustrative-2.png" alt="Illustration examples" />
+        <SectionImage src="/images/sanctify/Design System.png" alt="Design system" />
+        <SectionImage src="/images/sanctify/Deatils and color pallette.png" alt="Color palette and details" />
       </SectionText>
     ),
   },
@@ -219,7 +235,7 @@ export default function SanctifyPage() {
       title="Sanctify"
       subtitle="Launching a convenient and delightful investment app that lets you make well-informed decisions in line with Catholic values."
       tags={["B2C Fintech", "Award winning", "Launched in 2023"]}
-      heroImage="/images/sanctify-hero.jpg"
+      heroImage="/images/sanctify/Display.png"
       sections={sections}
       sidebar={{
         role: "UX Designer",

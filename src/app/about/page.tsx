@@ -29,22 +29,22 @@ const highlights = [
 ];
 
 const companies = [
-  { name: "Opus Clip", logo: "/images/logo-opusclip.png" },
-  { name: "DrayEasy", logo: "/images/logo-drayeasy.png" },
-  { name: "IWP Capital", logo: "/images/logo-iwp.png" },
-  { name: "Sasaki", logo: "/images/logo-sasaki.png" },
-  { name: "RISD", logo: "/images/logo-risd.png" },
+  { name: "Opus Clip", logo: "/images/about/logo-opus-clip.png" },
+  { name: "DrayEasy", logo: "/images/about/logo-drayeasy.png" },
+  { name: "IWP Capital", logo: "/images/about/logo-iwp.png" },
+  { name: "Sasaki", logo: "/images/about/logo-sasaki.png" },
+  { name: "RISD", logo: "/images/about/logo-risd.png" },
 ];
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Photo */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pt-12 pb-16">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-12 pb-16">
         <div className="flex justify-end">
           <div className="relative w-full max-w-xl aspect-[3/4] rounded-xl overflow-hidden shadow-lg">
             <Image
-              src="/images/about-photo.jpg"
+              src="/images/about/photo.jpeg"
               alt="Wenxin Li - portrait photo in mountains"
               fill
               className="object-cover"
@@ -56,9 +56,9 @@ export default function AboutPage() {
       </section>
 
       {/* Highlights */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pb-16">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
-          <h2 className="font-display text-3xl lg:text-4xl font-semibold">
+          <h2 className="font-thicccboi text-3xl lg:text-4xl font-medium tracking-[-0.02em] text-primary">
             Highlights
           </h2>
           <div className="space-y-4">
@@ -84,9 +84,9 @@ export default function AboutPage() {
       </section>
 
       {/* Companies */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pb-16">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
-          <h2 className="font-display text-3xl lg:text-4xl font-semibold leading-snug">
+          <h2 className="font-thicccboi text-3xl lg:text-4xl font-medium tracking-[-0.02em] text-primary leading-snug">
             Companies/<br />Organizations<br />I&apos;ve worked with
           </h2>
           <div className="flex flex-wrap items-center gap-6">

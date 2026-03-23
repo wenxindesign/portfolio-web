@@ -12,17 +12,17 @@ const caseStudies = [
       "Finalist | 2023 iF Design Awards",
     ],
     href: "/work/sanctify",
-    imageSrc: "/images/sanctify-preview.jpg",
+    imageSrc: "/images/home/sanctify-preview.png",
     imageAlt: "Sanctify app preview showing mobile screens",
   },
   {
     tags: ["B2C AIGC", "Dashboard"],
-    title: "Opus Clip - AI Content Optimization Tool",
+    title: "Opus Clip - From Metrics to Diagnosis",
     description:
-      "Help users understand their video performance and create popular videos with AI assistance.",
+      "Designing a structured system that helps creators understand performance and improve their videos.",
     awards: [],
     href: "/work/opus-clip",
-    imageSrc: "/images/opusclip-preview.jpg",
+    imageSrc: "/images/home/opus-preview.png",
     imageAlt: "Opus Clip dashboard showing performance analytics",
   },
   {
@@ -32,7 +32,7 @@ const caseStudies = [
       "Revamping the web platform and empowering freight agent's logistic journey with instant quotes.",
     awards: [],
     href: "/work/drayeasy",
-    imageSrc: "/images/drayeasy-preview.jpg",
+    imageSrc: "/images/home/DrayEasy.png",
     imageAlt: "DrayEasy platform showing freight logistics interface",
   },
 ];
@@ -49,47 +49,51 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 pt-16 pb-20 lg:pt-24 lg:pb-28">
-        <div className="mb-8">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center overflow-hidden">
-            <Image
-              src="/images/avatar.png"
-              alt="Wenxin"
-              width={80}
-              height={80}
-              className="rounded-full"
-            />
+      <section className="hero-gradient w-full -mt-16">
+        <div className="hero-shimmer" aria-hidden="true" />
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-[calc(140px+64px)] pb-[140px] font-thicccboi relative">
+          <div>
+              <p className="text-base md:text-lg text-secondary tracking-[-0.01em] mb-6">
+                AI-savvy · Research-driven · Red Dot Winner
+              </p>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[1.15] tracking-tight max-w-4xl mb-4">
+                <span className="text-primary font-semibold">I&apos;m </span>
+                <span className="text-primary" style={{ fontFamily: "'Caveat', cursive", fontSize: "1.25em", fontWeight: 600 }}>Wen</span>
+                <span className="text-primary font-semibold">,</span>
+              </h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[1.15] tracking-tight max-w-4xl mb-8">
+                <span className="text-primary font-semibold">Product designer</span>
+                <span className="text-secondary"> who turns complex systems into intuitive experiences.</span>
+              </h1>
+
+              <div className="space-y-1 text-base md:text-lg text-secondary">
+                <p>Currently designing AI tools at <a href="https://antigma.ai" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:text-accent transition-colors">Antigma.ai</a> ↗</p>
+                <p>MDes from <span className="text-primary font-medium">Rhode Island School of Design (RISD)</span></p>
+                <p>Previously at <a href="https://www.opus.pro" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:text-accent transition-colors">Opus Clip</a>, <a href="https://www.sasaki.com/" target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:text-accent transition-colors">Sasaki</a></p>
+              </div>
           </div>
         </div>
-
-        <h1 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.15] tracking-tight max-w-3xl">
-          <span className="text-secondary">Wenxin is an award-winning product designer and she designs</span>{" "}
-          <span className="text-primary font-semibold relative inline-block">
-            next-gen smart screens
-            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary" />
-          </span>
-          <span className="text-secondary">.</span>
-        </h1>
       </section>
 
-      <div className="max-w-content mx-auto px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px]">
         <hr className="border-black/10" />
       </div>
 
       {/* Case Studies */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 py-16 lg:py-24 space-y-8">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] py-16 lg:py-24 space-y-8">
         {caseStudies.map((study) => (
           <CaseStudyCard key={study.href} {...study} />
         ))}
       </section>
 
-      <div className="max-w-content mx-auto px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px]">
         <hr className="border-black/10" />
       </div>
 
       {/* Skills Section */}
-      <section className="max-w-content mx-auto px-6 lg:px-8 py-16 lg:py-24">
-        <p className="font-display text-2xl md:text-3xl text-secondary mb-8 max-w-xl">
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] py-16 lg:py-24">
+        <p className="font-thicccboi text-2xl md:text-3xl text-secondary tracking-[-0.02em] mb-8 max-w-xl">
           Click below. See more of my{" "}
           <a
             href="/play"

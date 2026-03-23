@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#1a1a1a",
-        secondary: "#6b7280",
+        primary: "#171717",
+        secondary: "#666666",
         accent: "#7c6cad",
         background: "#f5f5f5",
         surface: "#ffffff",
@@ -18,9 +18,10 @@ const config: Config = {
       fontFamily: {
         display: ['"Playfair Display"', "Georgia", "serif"],
         body: ['"DM Sans"', "system-ui", "sans-serif"],
+        thicccboi: ['"THICCCBOI"', "system-ui", "sans-serif"],
       },
       maxWidth: {
-        content: "1200px",
+        content: "1920px",
       },
     },
   },
