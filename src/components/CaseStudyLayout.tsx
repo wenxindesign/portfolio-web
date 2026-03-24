@@ -55,13 +55,13 @@ export default function CaseStudyLayout({
 
       {/* Hero */}
       <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-12 pb-8">
-        <h1 className="font-thicccboi text-5xl md:text-6xl lg:text-7xl font-medium tracking-[-0.02em] text-primary mb-6">
+        <h1 className="font-thicccboi text-5xl md:text-6xl lg:text-7xl font-medium tracking-[-0.02em] leading-[1.1] text-primary mb-4">
           {title}
         </h1>
-        <p className="font-thicccboi text-xl md:text-2xl lg:text-3xl text-secondary leading-relaxed max-w-4xl mb-6">
+        <p className="font-thicccboi text-xl md:text-2xl lg:text-3xl text-primary leading-[1.4] max-w-4xl mb-5">
           {subtitle}
         </p>
-        <div className="flex flex-wrap gap-3 mb-10">
+        <div className="flex flex-wrap gap-3 mb-8">
           {tags.map((tag) => (
             <span
               key={tag}
@@ -76,7 +76,7 @@ export default function CaseStudyLayout({
       {/* Hero Image */}
       {heroImage && (
         <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pb-12">
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-surface shadow-md">
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#0a1628] shadow-md">
             <Image
               src={heroImage}
               alt={`${title} hero image`}
@@ -84,6 +84,7 @@ export default function CaseStudyLayout({
               className="object-cover"
               sizes="(max-width: 1440px) 100vw, 1200px"
               priority
+              unoptimized
             />
           </div>
         </section>
@@ -136,7 +137,7 @@ export default function CaseStudyLayout({
         {/* Sections */}
         {sections.map((section) => (
           <section key={section.id} id={section.id} className="mb-16 scroll-mt-24">
-            <h2 className="font-thicccboi text-3xl font-medium tracking-[-0.02em] text-primary mb-6">{section.title}</h2>
+            <h2 className="font-thicccboi text-[14px] font-bold text-[#5B3FFF] mb-6">{section.title}</h2>
             <div className="prose prose-lg max-w-none text-primary/80 leading-relaxed">
               {section.content}
             </div>

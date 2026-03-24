@@ -18,22 +18,24 @@ function SectionImage({
   alt,
   caption,
   isGif,
+  dark,
 }: {
   src: string;
   alt: string;
   caption?: string;
   isGif?: boolean;
+  dark?: boolean;
 }) {
   return (
     <figure className="my-8">
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-surface border border-black/5">
+      <div className={`relative w-full aspect-video rounded-xl overflow-hidden border ${dark ? 'bg-[#0D0D11] border-white/5' : 'bg-surface border-black/5'}`}>
         <Image
           src={src}
           alt={alt}
           fill
-          className="object-contain"
+          className={dark ? "object-cover" : "object-contain"}
           sizes="(max-width: 1440px) 100vw, 1200px"
-          unoptimized={isGif}
+          unoptimized
         />
       </div>
       {caption && (
@@ -379,9 +381,10 @@ const sections = [
         </p>
 
         <SectionImage
-          src="/images/opus-clip/main-page.jpg"
+          src="/images/opus-clip/hifi-command-center.jpg"
           alt="Hi-Fi Command Center prototype"
           caption="Video Performance Diagnosis — Command Center layout"
+          dark
         />
 
         <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
@@ -476,17 +479,12 @@ export default function OpusClipPage() {
         "Video Analytics",
         "AI Diagnosis Product",
       ]}
-      heroImage="/images/opus-clip/main-page.jpg"
+      heroImage="/images/opus-clip/hero-mockup.jpg"
       sections={sections}
       sidebar={{
         role: "Design Lead Contractor",
         teammates: [
-          "Willow Sheng (PM)",
-          "Wenxin Li (Design Lead)",
-          "Hayley Heshuote (Design Lead)",
-          "Wendy Yang",
-          "Alora Zhao",
-          "Yilin Li",
+          "1 PM, 1 Design Lead, 3 Designers",
         ],
         tools: ["Figma", "Adobe Illustrator"],
         timeline: "Oct 2023 – Mar 2024",

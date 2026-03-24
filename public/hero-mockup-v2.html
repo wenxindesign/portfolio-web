@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>OpusClip Hero — v2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, 'SF Pro Display', sans-serif;
+  }
+
+  /* ── Abstract tech background ── */
+  .bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a1628 0%, #0f2847 25%, #132e52 40%, #0d2240 60%, #091a33 100%);
+  }
+
+  /* Mesh / aurora gradient overlays */
+  .bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 900px 600px at 15% 30%, rgba(56,140,255,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 700px 500px at 80% 20%, rgba(99,102,241,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 400px at 60% 80%, rgba(56,189,248,0.10) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 300px at 30% 75%, rgba(139,92,246,0.08) 0%, transparent 70%);
+  }
+
+  /* Subtle grid texture */
+  .bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  /* Floating abstract shapes */
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(1px);
+  }
+
+  .shape-1 {
+    width: 320px; height: 320px;
+    top: -60px; left: -80px;
+    background: radial-gradient(circle, rgba(56,140,255,0.12) 0%, transparent 70%);
+    filter: blur(40px);
+  }
+
+  .shape-2 {
+    width: 200px; height: 200px;
+    top: 60px; right: 80px;
+    background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+    filter: blur(30px);
+  }
+
+  .shape-3 {
+    width: 160px; height: 160px;
+    bottom: 120px; left: 120px;
+    background: radial-gradient(circle, rgba(56,189,248,0.10) 0%, transparent 70%);
+    filter: blur(25px);
+  }
+
+  .shape-4 {
+    width: 100px; height: 100px;
+    bottom: 60px; right: 200px;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+    filter: blur(20px);
+  }
+
+  /* Glass orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+  }
+
+  .orb-1 {
+    width: 48px; height: 48px;
+    top: 80px; left: 60px;
+    background: radial-gradient(circle at 35% 35%,
+      rgba(56,140,255,0.25) 0%,
+      rgba(56,140,255,0.08) 50%,
+      transparent 70%);
+    border: 1px solid rgba(56,140,255,0.15);
+    box-shadow: 0 0 30px rgba(56,140,255,0.1);
+  }
+
+  .orb-2 {
+    width: 32px; height: 32px;
+    top: 160px; right: 100px;
+    background: radial-gradient(circle at 35% 35%,
+      rgba(139,92,246,0.25) 0%,
+      rgba(139,92,246,0.08) 50%,
+      transparent 70%);
+    border: 1px solid rgba(139,92,246,0.12);
+    box-shadow: 0 0 20px rgba(139,92,246,0.08);
+  }
+
+  .orb-3 {
+    width: 24px; height: 24px;
+    bottom: 180px; left: 200px;
+    background: radial-gradient(circle at 35% 35%,
+      rgba(56,189,248,0.30) 0%,
+      rgba(56,189,248,0.08) 50%,
+      transparent 70%);
+    border: 1px solid rgba(56,189,248,0.15);
+  }
+
+  .orb-4 {
+    width: 56px; height: 56px;
+    bottom: 100px; right: 60px;
+    background: radial-gradient(circle at 35% 35%,
+      rgba(99,102,241,0.20) 0%,
+      rgba(99,102,241,0.06) 50%,
+      transparent 70%);
+    border: 1px solid rgba(99,102,241,0.10);
+    box-shadow: 0 0 40px rgba(99,102,241,0.06);
+  }
+
+  /* Diagonal light streaks */
+  .streak {
+    position: absolute;
+    background: linear-gradient(135deg, transparent, rgba(56,140,255,0.04), transparent);
+    transform: rotate(-35deg);
+  }
+
+  .streak-1 {
+    width: 800px; height: 2px;
+    top: 200px; left: -100px;
+    background: linear-gradient(90deg, transparent, rgba(56,140,255,0.08), transparent);
+    transform: rotate(-25deg);
+  }
+
+  .streak-2 {
+    width: 600px; height: 1px;
+    top: 350px; right: -50px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.06), transparent);
+    transform: rotate(-20deg);
+  }
+
+  /* ── MacBook Container ── */
+  .laptop-scene {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -48%);
+    width: 1100px;
+    perspective: 2200px;
+  }
+
+  .laptop-body {
+    transform: rotateX(12deg) rotateY(-8deg);
+    transform-style: preserve-3d;
+  }
+
+  /* Screen + Bezel */
+  .screen-assembly {
+    position: relative;
+    width: 100%;
+    padding: 14px 14px 20px 14px;
+    background: linear-gradient(180deg, #2a2a2e 0%, #1c1c1f 100%);
+    border-radius: 14px 14px 2px 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 30px 80px rgba(0,0,0,0.5),
+      0 10px 30px rgba(0,0,0,0.4);
+  }
+
+  /* Camera notch */
+  .camera-notch {
+    position: absolute;
+    top: 5px; left: 50%;
+    transform: translateX(-50%);
+    width: 8px; height: 8px;
+    background: radial-gradient(circle, #1a1a22 40%, #0d0d12 70%);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .camera-dot {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 3px; height: 3px;
+    background: radial-gradient(circle, #2a3a50, #1a2535);
+    border-radius: 50%;
+  }
+
+  /* Screen area */
+  .screen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0D0D11;
+  }
+
+  .screen img.screen-content {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Screen reflection */
+  .screen-reflection {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      165deg,
+      rgba(255,255,255,0.04) 0%,
+      transparent 35%,
+      transparent 65%,
+      rgba(255,255,255,0.01) 100%
+    );
+    pointer-events: none;
+    border-radius: 4px;
+  }
+
+  /* Keyboard base */
+  .keyboard-base {
+    position: relative;
+    width: 108%;
+    margin-left: -4%;
+    height: 14px;
+    background: linear-gradient(180deg, #3a3a3f 0%, #2a2a2e 40%, #222225 100%);
+    border-radius: 0 0 10px 10px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 8px 30px rgba(0,0,0,0.4),
+      0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  /* Front lip indent */
+  .keyboard-base::after {
+    content: '';
+    position: absolute;
+    bottom: 3px; left: 50%;
+    transform: translateX(-50%);
+    width: 160px; height: 4px;
+    background: linear-gradient(180deg, #1e1e22 0%, #2a2a2e 100%);
+    border-radius: 4px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  /* Ambient light glow under laptop */
+  .ambient-glow {
+    position: absolute;
+    bottom: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 120px;
+    background: radial-gradient(ellipse, rgba(56,140,255,0.06) 0%, transparent 70%);
+    filter: blur(20px);
+  }
+
+  /* Screen edge light spill */
+  .screen-glow {
+    position: absolute;
+    top: -20px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 80px;
+    background: radial-gradient(ellipse, rgba(56,140,255,0.04) 0%, transparent 70%);
+    filter: blur(15px);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <!-- Abstract shapes -->
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+  <div class="shape shape-4"></div>
+
+  <!-- Light streaks -->
+  <div class="streak streak-1"></div>
+  <div class="streak streak-2"></div>
+
+  <!-- Glass orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+
+<!-- Screen light spill -->
+<div class="screen-glow"></div>
+
+<div class="laptop-scene">
+  <div class="laptop-body">
+    <!-- Screen Assembly -->
+    <div class="screen-assembly">
+      <div class="camera-notch">
+        <div class="camera-dot"></div>
+      </div>
+      <div class="screen" id="screenEl">
+        <img class="screen-content" src="hifi-screenshot.jpg" alt="Command Center"/>
+        <div class="screen-reflection"></div>
+      </div>
+    </div>
+    <!-- Keyboard -->
+    <div class="keyboard-base"></div>
+  </div>
+  <!-- Ambient glow -->
+  <div class="ambient-glow"></div>
+</div>
+
+<script>
+  // No script needed — using static image
+</script>
+
+</body>
+</html>
