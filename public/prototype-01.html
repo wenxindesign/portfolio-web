@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>Video Performance Diagnosis — OpusClip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* OpusClip-aligned palette */
+      --bg:       #0D0D11;
+      --s1:       #141418;
+      --s2:       #1A1A20;
+      --s3:       #202028;
+      --s4:       #26262F;
+
+      --b1:       #26262F;
+      --b2:       #303040;
+      --b3:       #3E3E52;
+
+      /* Brand purple (OpusClip) */
+      --purple:      #8B5CF6;
+      --purple-light: #A78BFA;
+      --purple-dim:   rgba(139,92,246,0.10);
+      --purple-mid:   rgba(139,92,246,0.18);
+      --purple-glow:  rgba(139,92,246,0.35);
+
+      /* Status */
+      --green:      #34D399;
+      --green-dim:  rgba(52,211,153,0.10);
+      --orange:     #FB923C;
+      --orange-dim: rgba(251,146,60,0.10);
+      --red:        #F87171;
+      --red-dim:    rgba(248,113,113,0.08);
+      --blue:       #60A5FA;
+
+      /* Text */
+      --t1: #F0F0F6;
+      --t2: #8888A0;
+      --t3: #4A4A62;
+      --t4: #2E2E40;
+
+      --nav-h:     54px;
+      --sidebar-w: 360px;
+      --sb-left-w: 180px;
+      --sb-right-w: 180px;
+
+      --f: 'Inter', -apple-system, sans-serif;
+      --fmono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: var(--f);
+      color: var(--t1);
+      min-width: 1440px;
+      -webkit-font-smoothing: antialiased;
+      font-size: 13px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      height: var(--nav-h);
+      background: var(--s1);
+      border-bottom: 1px solid var(--b1);
+      display: flex; align-items: center;
+      padding: 0 28px 0 20px;
+      position: sticky; top: 0; z-index: 200;
+      gap: 0;
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 9px;
+      margin-right: 32px;
+    }
+    .nav-logo svg { display: block; height: 22px; width: auto; }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2px;
+      flex: 1;
+    }
+    .nav-link {
+      padding: 6px 14px;
+      font-size: 13px; font-weight: 400;
+      color: var(--t2); border-radius: 6px;
+      cursor: pointer; transition: all 0.18s ease;
+      position: relative;
+    }
+    .nav-link:hover { color: var(--t1); background: var(--s2); }
+    .nav-link.active { color: var(--t1); font-weight: 500; }
+    .nav-link.active::after {
+      content: ''; display: block;
+      height: 2px; border-radius: 1px;
+      background: var(--purple);
+      margin-top: 2px;
+    }
+
+    /* ── PAGE TRANSITIONS ── */
+    .page {
+      position: absolute; top: 0; left: 0; right: 0;
+      opacity: 1; transform: translateY(0);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .page.page-exit {
+      opacity: 0; transform: translateY(-6px);
+      pointer-events: none;
+    }
+    .page.page-enter {
+      opacity: 0; transform: translateY(8px);
+    }
+    .page.page-hidden {
+      display: none;
+    }
+    #page-wrap {
+      position: relative;
+      min-height: calc(100vh - var(--nav-h));
+    }
+
+    /* Overview page: full-width SVG */
+    .overview-page {
+      width: 100%;
+      background: #09090B;
+    }
+    .overview-page img {
+      display: block;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .nav-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .nav-search {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 8px; padding: 6px 12px;
+      font-size: 12px; color: var(--t3); width: 200px;
+      cursor: text;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .nav-search:hover { border-color: var(--b2); }
+    .nav-search:focus-within { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple-dim); }
+    .nav-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid var(--purple);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .nav-avatar:hover {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 12px var(--purple-glow);
+    }
+    .nav-avatar img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex; align-items: flex-start;
+      min-height: calc(100vh - var(--nav-h));
+    }
+
+    /* ── SIDEBAR ── */
+    aside {
+      width: var(--sidebar-w); min-width: var(--sidebar-w);
+      height: calc(100vh - var(--nav-h));
+      position: sticky; top: var(--nav-h);
+      display: flex;
+      border-right: 1px solid var(--b1);
+      overflow: hidden;
+    }
+
+    .sb-panel {
+      width: var(--sb-left-w); min-width: var(--sb-left-w);
+      height: 100%;
+      background: var(--s1);
+      border-right: 1px solid var(--b1);
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .sb-panel:last-child {
+      border-right: none;
+      width: var(--sb-right-w); min-width: var(--sb-right-w);
+    }
+
+    .sb-block { padding: 16px; border-bottom: 1px solid var(--b1); }
+
+    .sb-lbl {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--t3); margin-bottom: 10px;
+    }
+
+    /* analysis status */
+    .status-list { display: flex; flex-direction: column; gap: 9px; }
+    .status-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--t2);
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--t3); flex-shrink: 0;
+    }
+    .status-dot.done { background: var(--green); box-shadow: 0 0 5px rgba(52,211,153,0.4); }
+
+    /* other videos list */
+    .vid-list { display: flex; flex-direction: column; }
+    .vid-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--b1);
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.15s ease;
+    }
+    .vid-item:last-child { border-bottom: none; }
+    .vid-item:hover { background: var(--s2); }
+    .vid-item:hover .vid-item-score { color: var(--t2); }
+    .vid-item:hover .vid-item-thumb { border-color: var(--b3); transform: scale(1.03); }
+    .vid-item.active { background: var(--purple-dim); border-left: 3px solid var(--purple); padding-left: 11px; }
+    .vid-item-thumb {
+      width: 40px; height: 24px;
+      background: var(--s3); border: 1px solid var(--b2);
+      border-radius: 4px; flex-shrink: 0;
+      overflow: hidden;
+      transition: border-color 0.18s, transform 0.18s;
+    }
+    .vid-item-thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .vid-item.active .vid-item-thumb { border-color: rgba(139,92,246,0.4); }
+    .vid-item-info { flex: 1; min-width: 0; }
+    .vid-item-title {
+      font-size: 12px; font-weight: 500; color: var(--t1);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .vid-item-meta { font-size: 10px; color: var(--t3); }
+    .vid-item-score {
+      font-family: var(--fmono);
+      font-size: 11px; font-weight: 500;
+      color: var(--t3); flex-shrink: 0;
+      transition: color 0.18s;
+    }
+    .vid-item.active .vid-item-score {
+      font-size: 13px; font-weight: 700; color: var(--purple-light);
+    }
+
+    /* custom scrollbar for other videos panel */
+    .sb-panel::-webkit-scrollbar { width: 3px; }
+    .sb-panel::-webkit-scrollbar-track { background: transparent; }
+    .sb-panel::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 2px; }
+    .sb-panel::-webkit-scrollbar-thumb:hover { background: var(--b3); }
+
+    /* video selector */
+    .vid-sel {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 10px; padding: 10px 12px; cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .vid-sel:hover { border-color: var(--b2); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .vid-sel-row { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+    .vid-thumb-mini {
+      width: 36px; height: 20px; background: var(--s3);
+      border: 1px solid var(--b2); border-radius: 3px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .vid-thumb-mini img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .vid-sel-title { font-size: 11px; font-weight: 500; color: var(--t1); line-height: 1.35; }
+    .vid-sel-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 10px; color: var(--t3);
+    }
+
+    /* filter list */
+    .filter-list { display: flex; flex-direction: column; gap: 1px; }
+    .fi {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 8px; border-radius: 8px;
+      cursor: pointer; transition: background 0.18s ease;
+    }
+    .fi:hover { background: var(--s2); }
+    .fi.active { background: var(--purple-dim); }
+
+    .fi-radio {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid var(--b2); flex-shrink: 0;
+      position: relative; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .fi:hover .fi-radio { border-color: var(--b3); }
+    .fi.active .fi-radio { border-color: var(--purple); box-shadow: 0 0 6px var(--purple-dim); }
+    .fi.active .fi-radio::after {
+      content: ''; position: absolute; inset: 2.5px;
+      border-radius: 50%; background: var(--purple);
+      animation: radioIn 0.2s ease;
+    }
+    @keyframes radioIn { from { transform: scale(0); } to { transform: scale(1); } }
+    .fi-lbl { font-size: 12px; color: var(--t2); font-weight: 400; transition: color 0.15s; }
+    .fi:hover .fi-lbl { color: var(--t1); }
+    .fi.active .fi-lbl { color: var(--t1); font-weight: 500; }
+
+    /* ── MAIN ── */
+    main { flex: 1; padding: 24px 44px 80px; min-width: 0; }
+
+    /* section */
+    .section {
+      margin-bottom: 48px;
+      opacity: 0; transform: translateY(10px);
+      animation: fadeUp 0.4s ease forwards;
+    }
+    .section:nth-child(1) { animation-delay: 0.04s; }
+    .section:nth-child(2) { animation-delay: 0.11s; }
+    .section:nth-child(3) { animation-delay: 0.18s; }
+    .section:nth-child(4) { animation-delay: 0.25s; }
+    .section:nth-child(5) { animation-delay: 0.32s; }
+    @keyframes fadeUp { to { opacity: 1; transform: none; } }
+
+    .sec-hd {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .sec-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.01em;
+    }
+    .sec-tag {
+      font-family: var(--fmono);
+      font-size: 9px; color: var(--t3);
+      padding: 2px 8px; border: 1px solid var(--b1); border-radius: 4px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .sec-tag:hover { color: var(--t2); border-color: var(--b2); }
+
+    /* ── 1. VIDEO OVERVIEW ── */
+    .video-overview {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 14px; overflow: hidden;
+      display: flex; align-items: stretch;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .video-overview:hover {
+      border-color: var(--b2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .vo-thumb {
+      width: 108px; min-width: 108px;
+      background: var(--s3); border-right: 1px solid var(--b1);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .vo-thumb-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      filter: brightness(0.5);
+      transition: filter 0.3s, transform 0.3s;
+    }
+    .video-overview:hover .vo-thumb-bg {
+      filter: brightness(0.65);
+      transform: scale(1.05);
+    }
+    .vo-thumb-inner {
+      width: 100%; aspect-ratio: 9/16;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      position: relative; z-index: 1;
+    }
+    .vo-play {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(139,92,246,0.15);
+      border: 1.5px solid rgba(139,92,246,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .vo-play:hover {
+      transform: scale(1.12);
+      background: rgba(139,92,246,0.3);
+      box-shadow: 0 0 16px var(--purple-glow);
+    }
+    .vo-thumb-ratio { font-family: var(--fmono); font-size: 9px; color: var(--t4); }
+
+    .vo-info { flex: 1; padding: 14px 22px; display: flex; flex-direction: column; gap: 10px; }
+
+    .vo-header { display: flex; align-items: flex-start; justify-content: space-between; }
+    .vo-title {
+      font-size: 16px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.02em;
+      margin-bottom: 7px; line-height: 1.35;
+    }
+    .vo-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .meta-text { font-size: 12px; color: var(--t2); }
+    .meta-sep  { font-size: 11px; color: var(--t4); }
+    .platform-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 9px; background: var(--s3);
+      border: 1px solid var(--b2); border-radius: 5px;
+      font-size: 11px; font-weight: 500; color: var(--t2);
+      transition: background 0.15s, color 0.15s;
+    }
+    .platform-badge:hover { background: var(--s4); color: var(--t1); }
+    .vo-updated { font-size: 11px; color: var(--t3); white-space: nowrap; }
+
+    /* score row */
+    .score-row {
+      display: flex; align-items: stretch;
+      background: var(--s3); border: 1px solid var(--b1);
+      border-radius: 10px; overflow: hidden;
+    }
+    .score-block {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 18px; border-right: 1px solid var(--b1); flex-shrink: 0;
+    }
+
+    /* ring */
+    .ring-wrap {
+      position: relative; flex-shrink: 0;
+      cursor: pointer;
+      transition: transform 0.25s;
+    }
+    .ring-wrap:hover { transform: scale(1.08); }
+    .ring-wrap:hover .ring-fill { filter: drop-shadow(0 0 10px var(--purple-glow)); }
+    .ring-wrap svg { display: block; transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: var(--b2); stroke-width: 4; }
+    .ring-fill {
+      fill: none; stroke: url(#ringGrad); stroke-width: 4;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 5px var(--purple-glow));
+      transition: filter 0.25s;
+    }
+    .ring-num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--fmono); font-size: 16px; font-weight: 600; color: var(--t1);
+    }
+
+    .score-info { display: flex; flex-direction: column; gap: 2px; }
+    .score-lbl {
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--t3);
+    }
+    .score-grade { font-size: 19px; font-weight: 700; color: var(--purple-light); letter-spacing: -0.02em; }
+    .score-sub { font-size: 11px; color: var(--t2); }
+
+    .score-summary {
+      flex: 1; padding: 10px 18px;
+      display: flex; flex-direction: column; justify-content: center; gap: 7px;
+    }
+    .ss-lbl {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--t3);
+    }
+    .ss-text { font-size: 12px; color: var(--t2); line-height: 1.65; }
+    .ss-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500;
+      cursor: default;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .tag:hover { transform: translateY(-1px); }
+    .tag-green  { background: var(--green-dim);  color: var(--green);  border: 1px solid rgba(52,211,153,0.2); }
+    .tag-green:hover { box-shadow: 0 2px 8px rgba(52,211,153,0.15); }
+    .tag-orange { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(251,146,60,0.2); }
+    .tag-orange:hover { box-shadow: 0 2px 8px rgba(251,146,60,0.15); }
+
+    /* ── 2. PERFORMANCE SNAPSHOT ── */
+    .g4 { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+
+    .metric-card {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 12px; padding: 20px 18px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+    .metric-card:hover {
+      border-color: var(--purple);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139,92,246,0.1), 0 0 0 1px rgba(139,92,246,0.15);
+    }
+    .metric-card:hover .mc-val { color: var(--purple-light); }
+    .mc-lbl {
+      font-size: 11px; font-weight: 500; color: var(--t2);
+      margin-bottom: 10px; letter-spacing: 0;
+    }
+    .mc-val {
+      font-family: var(--fmono); font-size: 26px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.03em; line-height: 1; margin-bottom: 7px;
+      transition: color 0.2s;
+    }
+    .mc-delta { font-size: 11px; color: var(--t2); display: flex; align-items: center; gap: 4px; }
+    .up   { color: var(--green); }
+    .down { color: var(--red);   }
+
+    /* ── 3. CONTEXT BENCHMARK ── */
+    .g2 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+    .bench-card {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 12px; padding: 18px 20px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .bench-card:hover {
+      border-color: var(--b3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .bc-title { font-size: 12px; font-weight: 600; color: var(--t1); margin-bottom: 16px; }
+
+    .brow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .brow:last-child { margin-bottom: 0; }
+    .blbl { font-size: 11px; color: var(--t2); width: 82px; flex-shrink: 0; }
+    .btrack {
+      flex: 1; height: 3px; background: var(--s4); border-radius: 2px; overflow: hidden;
+    }
+    .bfill {
+      height: 100%; border-radius: 2px; width: 0;
+      animation: bfill 0.8s ease 0.5s forwards;
+    }
+    @keyframes bfill { to { width: var(--w); } }
+    .bfill.pos { background: var(--green); }
+    .bfill.neu { background: var(--b3); }
+    .bfill.neg { background: var(--red); }
+    .bval {
+      font-family: var(--fmono); font-size: 11px; font-weight: 500;
+      width: 48px; text-align: right; flex-shrink: 0;
+    }
+    .bval.pos { color: var(--green); }
+    .bval.neu { color: var(--t2); }
+    .bval.neg { color: var(--red); }
+
+    /* ── 4. STRUCTURAL DIAGNOSIS ── */
+    .diag-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: stretch; }
+    .diag-right { display: flex; flex-direction: column; gap: 12px; }
+    .diag-right > .diag-card { flex: 1; display: flex; flex-direction: column; }
+    .diag-right > .diag-card > :last-child { margin-top: auto; }
+    .diag-card {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 12px; padding: 18px 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .diag-card:hover {
+      border-color: var(--b2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+    .dc-lbl { font-size: 12px; font-weight: 600; color: var(--t1); margin-bottom: 14px; }
+    .dc-sub { font-size: 11px; color: var(--t3); margin-top: 8px; }
+
+    /* chart */
+    .chart-axis { font-family: 'JetBrains Mono', monospace; font-size: 7.5px; fill: #3E3E52; }
+    .grid-line  { stroke: #26262F; stroke-width: 0.5; }
+    .ret-area   { fill: url(#retGrad); }
+    .ret-line   { fill: none; stroke: url(#lineGrad); stroke-width: 2; }
+
+    .drop-group.visible { opacity: 1; }
+
+    .drop-line  { stroke: #FB923C; stroke-width: 1; stroke-dasharray: 3 3; }
+
+    .fake-cursor { display: none; }
+
+    /* length match */
+    .lm-row { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+    .lm-labels {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 1px;
+    }
+    .lm-label { font-size: 11px; color: var(--t2); }
+    .lm-val   { font-family: var(--fmono); font-size: 11px; }
+    .lm-track { height: 6px; background: var(--s4); border-radius: 3px; overflow: hidden; }
+    .lm-fill  {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--purple) 0%, var(--purple) 83%, var(--orange) 83%, var(--orange) 100%);
+    }
+    .lm-note { font-size: 10px; color: var(--orange); margin-top: 2px; }
+
+    /* ── 5. OPTIMIZATION HINTS ── */
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+
+    .hint-card {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 12px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .hint-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    .hint-card.p1:hover { border-color: var(--purple); box-shadow: 0 6px 20px rgba(139,92,246,0.15); }
+    .hint-card.p2:hover { border-color: var(--orange); box-shadow: 0 6px 20px rgba(251,146,60,0.1); }
+    .hint-card.p3:hover { border-color: var(--b3); }
+    .hint-card.p1 { border-top: 2px solid var(--purple); }
+    .hint-card.p2 { border-top: 2px solid var(--orange); }
+    .hint-card.p3 { border-top: 2px solid var(--b3); }
+
+    .hint-top { display: flex; align-items: center; gap: 7px; }
+    .pdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .p1 .pdot { background: var(--purple); box-shadow: 0 0 6px var(--purple-glow); }
+    .p2 .pdot { background: var(--orange); }
+    .p3 .pdot { background: var(--b3); }
+    .plbl {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--t3);
+    }
+    .rule-tag {
+      margin-left: auto;
+      font-family: var(--fmono); font-size: 9px; color: var(--t4);
+      padding: 1px 7px; border: 1px solid var(--b1); border-radius: 4px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .hint-title { font-size: 14px; font-weight: 600; color: var(--t1); letter-spacing: -0.01em; line-height: 1.35; }
+    .hint-desc  { font-size: 12px; color: var(--t2); line-height: 1.65; flex: 1; }
+
+    .hint-cta {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 14px; background: var(--s4);
+      border: 1px solid var(--b3); border-radius: 8px;
+      font-size: 12px; font-weight: 500; color: var(--t1);
+      cursor: pointer; align-self: flex-start;
+      transition: all 0.2s ease;
+    }
+    .hint-cta:hover {
+      background: var(--b1); color: var(--t1); border-color: var(--b3);
+      transform: translateX(2px);
+    }
+    .hint-cta.primary {
+      background: var(--purple-mid); border-color: rgba(139,92,246,0.45); color: var(--purple-light);
+    }
+    .hint-cta.primary:hover {
+      background: rgba(139,92,246,0.28);
+      box-shadow: 0 0 16px var(--purple-dim);
+      transform: translateX(2px);
+    }
+
+    /* ── TOOLTIP ── */
+    .tooltip-wrap {
+      position: relative;
+    }
+    .tooltip-wrap .tooltip {
+      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      background: var(--s4); border: 1px solid var(--b2); border-radius: 6px;
+      padding: 6px 10px; font-size: 11px; color: var(--t1);
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity 0.15s;
+      z-index: 100;
+    }
+    .tooltip-wrap .tooltip::after {
+      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      border: 4px solid transparent; border-top-color: var(--b2);
+    }
+    .tooltip-wrap:hover .tooltip { opacity: 1; }
+
+    /* ── NBA THUMBNAIL SVGs ── */
+    .nba-thumb {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; color: var(--t3); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <svg width="123" height="32" viewBox="0 0 123 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M43.7646 16.2233C43.7646 12.4187 46.6096 9.61035 50.4507 9.61035C54.2918 9.61035 57.0831 12.4187 57.0831 16.2233C57.0831 20.0279 54.2382 22.8363 50.4507 22.8363C46.6631 22.8363 43.7646 20.0279 43.7646 16.2233ZM50.4507 20.3421C52.5941 20.3421 54.1627 18.5884 54.1627 16.2233C54.1627 13.8582 52.5917 12.1045 50.4507 12.1045C48.3097 12.1045 46.6997 13.8582 46.6997 16.2233C46.6997 18.5884 48.2512 20.3421 50.4507 20.3421Z" fill="white"/>
+      <path d="M58.5791 13.379H60.138C60.7859 13.379 61.312 13.9052 61.312 14.5531C61.8283 13.8686 62.8635 13.2305 63.9547 13.2305C66.6705 13.2305 68.4998 15.0767 68.4998 18.0337C68.4998 20.9907 66.6705 22.8369 63.9547 22.8369C62.866 22.8369 61.8308 22.3936 61.3315 21.7092V26.0496H58.5986L58.5791 13.3766V13.379ZM63.5285 20.5084C64.8389 20.5084 65.745 19.5097 65.745 18.0142C65.745 16.5187 64.8389 15.5395 63.5285 15.5395C62.2181 15.5395 61.3315 16.5382 61.3315 18.0142C61.3315 19.4903 62.2181 20.5084 63.5285 20.5084Z" fill="white"/>
+      <path d="M69.9189 19.3659V13.3813H72.6348V18.7009C72.6348 19.7897 73.2632 20.4547 74.2423 20.4547C75.5162 20.4547 76.2567 19.3659 76.2567 17.4246V13.3789H78.9895V22.6882H76.2567V21.653C75.8134 22.2449 74.7611 22.8343 73.3752 22.8343C71.3438 22.8343 69.9214 21.5044 69.9214 19.361L69.9189 19.3659Z" fill="white"/>
+      <path d="M80.4688 19.5482H82.9069C82.9995 20.3252 83.4793 20.7685 84.3659 20.7685C85.1039 20.7685 85.5472 20.4543 85.5472 19.9379C85.5472 18.3499 80.6344 19.4752 80.6344 15.9848C80.6344 14.4527 81.9277 13.2324 84.0322 13.2324C86.3047 13.2324 87.7077 14.3967 87.9488 16.2624H85.5107C85.3621 15.578 84.8092 15.1737 84.0322 15.1737C83.4769 15.1737 83.0725 15.4148 83.0725 15.8191C83.0725 17.3147 88.0414 16.0968 88.0414 19.8454C88.0414 21.582 86.5069 22.8389 84.3659 22.8389C82.0008 22.8389 80.5784 21.453 80.4688 19.5507V19.5482Z" fill="white"/>
+      <path d="M89.1123 16.2233C89.1123 12.012 91.9572 9.61035 95.6522 9.61035C98.8479 9.61035 101.137 11.6052 101.359 14.4136H98.4411C98.256 13.0471 97.1477 12.1045 95.6522 12.1045C93.6013 12.1045 92.0498 13.5635 92.0498 16.2233C92.0498 18.8831 93.6208 20.3421 95.6522 20.3421C97.1112 20.3421 98.256 19.3824 98.4776 17.9965H101.415C101.12 20.7489 98.9404 22.8363 95.6522 22.8363C92.0303 22.8363 89.1123 20.4542 89.1123 16.2233Z" fill="white"/>
+      <path d="M102.799 9.61035H105.532V22.6901H102.799V9.61035Z" fill="white"/>
+      <path d="M108.822 9.13086C109.765 9.13086 110.447 9.79581 110.447 10.7019C110.447 11.608 109.763 12.2729 108.822 12.2729C107.882 12.2729 107.215 11.608 107.215 10.7019C107.215 9.79581 107.916 9.13086 108.822 9.13086ZM108.649 13.3787H110.208V22.688H107.475V14.5528C107.475 13.9049 108.002 13.3787 108.649 13.3787Z" fill="white"/>
+      <path d="M112.147 13.379H113.706C114.354 13.379 114.88 13.9052 114.88 14.5531C115.397 13.8686 116.432 13.2305 117.523 13.2305C120.239 13.2305 122.068 15.0767 122.068 18.0337C122.068 20.9907 120.239 22.8369 117.523 22.8369C116.434 22.8369 115.399 22.3936 114.9 21.7092V26.0496H112.167L112.147 13.3766V13.379ZM117.097 20.5084C118.407 20.5084 119.313 19.5097 119.313 18.0142C119.313 16.5187 118.407 15.5395 117.097 15.5395C115.786 15.5395 114.9 16.5382 114.9 18.0142C114.9 19.4903 115.786 20.5084 117.097 20.5084Z" fill="white"/>
+      <path d="M5.08879 15.9511C5.11515 9.94742 9.99016 5.08869 16 5.08869C22.0262 5.08869 26.9113 9.97385 26.9113 16C26.9113 22.0262 22.0262 26.9113 16 26.9113C15.2111 26.9113 14.4417 26.8276 13.7003 26.6685V31.836C14.4513 31.9441 15.2191 32 16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16V31.9511H5.08869C5.08869 31.9511 5.08879 22.9251 5.08879 16.8C5.08879 16.6768 5.08879 15.9511 5.08879 15.9511Z" fill="white"/>
+      <path d="M6.85015 15.993V32H11.9388L11.9391 17.0133V15.9511C11.9616 13.7338 13.7686 11.9388 16 11.9388C18.2455 11.9388 20.0612 13.7565 20.0612 15.993C20.0612 18.2295 18.2455 20.0472 16 20.0472C15.1458 20.0472 14.3538 19.7842 13.7003 19.3351V24.8446C14.4352 25.0347 15.2058 25.1359 16 25.1359C21.0508 25.1359 25.1498 21.045 25.1498 15.993C25.1498 10.941 21.0508 6.85015 16 6.85015C10.9492 6.85015 6.85015 10.941 6.85015 15.993Z" fill="white"/>
+    </svg>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link" data-page="overview">Overview</div>
+    <div class="nav-link active" data-page="platform">Platform Performance</div>
+    <div class="nav-link" data-page="similar">Similar Creators</div>
+    <div class="nav-link" data-page="inspiration">Inspiration for You</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4A4A62" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      Search...
+    </div>
+    <div class="nav-avatar">
+      <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop" alt="avatar"/>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE WRAP -->
+<div id="page-wrap">
+
+<!-- OVERVIEW PAGE -->
+<div id="page-overview" class="page page-hidden overview-page">
+  <img src="Overview.svg" alt="Overview" draggable="false"/>
+</div>
+
+<!-- PLATFORM PERFORMANCE PAGE -->
+<div id="page-platform" class="page">
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside>
+
+    <!-- Left panel: filters -->
+    <div class="sb-panel">
+      <!-- GROUP: VIDEO -->
+      <div style="padding:10px 16px 6px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--t4);">Video</div>
+      <div class="sb-block">
+        <div class="sb-lbl">Current Video</div>
+        <div class="vid-sel">
+          <div class="vid-sel-row">
+            <div class="vid-thumb-mini">
+              <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=72&h=40&fit=crop" alt=""/>
+            </div>
+            <div class="vid-sel-title">LeBron Game-Winner · TikTok</div>
+          </div>
+          <div class="vid-sel-foot">
+            <span>Mar 5, 2026 · 0:48</span>
+            <span>▾</span>
+          </div>
+        </div>
+      </div>
+      <div class="sb-block">
+        <div class="sb-lbl">Analysis Status</div>
+        <div class="status-list">
+          <div class="status-item"><div class="status-dot done"></div>Diagnosis complete</div>
+          <div class="status-item"><div class="status-dot done"></div>3 findings identified</div>
+          <div class="status-item"><div class="status-dot done"></div>3 actions generated</div>
+        </div>
+      </div>
+
+      <!-- GROUP: FILTERS -->
+      <div style="padding:14px 16px 6px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--t4); border-top:1px solid var(--b1); margin-top:4px;">Filters</div>
+      <div class="sb-block">
+        <div class="sb-lbl">Platform</div>
+        <div class="filter-list">
+          <div class="fi"><div class="fi-radio"></div><span class="fi-lbl">All</span></div>
+          <div class="fi active"><div class="fi-radio"></div><span class="fi-lbl">TikTok</span></div>
+          <div class="fi"><div class="fi-radio"></div><span class="fi-lbl">Instagram Reels</span></div>
+          <div class="fi"><div class="fi-radio"></div><span class="fi-lbl">YouTube Shorts</span></div>
+        </div>
+      </div>
+      <div class="sb-block">
+        <div class="sb-lbl">Time Range</div>
+        <div class="filter-list">
+          <div class="fi active"><div class="fi-radio"></div><span class="fi-lbl">Last 7 days</span></div>
+          <div class="fi"><div class="fi-radio"></div><span class="fi-lbl">Last 30 days</span></div>
+          <div class="fi"><div class="fi-radio"></div><span class="fi-lbl">All time</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel: other videos -->
+    <div class="sb-panel">
+      <div style="padding:10px 16px 6px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--t4);">Video</div>
+      <div style="padding:0 16px 10px; font-size:10px; font-weight:600; color:var(--t3); border-bottom:1px solid var(--b1);">Other Videos</div>
+      <div class="vid-list">
+        <div class="vid-item active">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">LeBron Game-Winner</div>
+            <div class="vid-item-meta">Mar 5 · TikTok</div>
+          </div>
+          <div class="vid-item-score">72</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Curry 3-Point Breakdown</div>
+            <div class="vid-item-meta">Mar 2 · Reels</div>
+          </div>
+          <div class="vid-item-score">61</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1518614368389-5160c0b0de72?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Dunk of the Week Reaction</div>
+            <div class="vid-item-meta">Feb 28 · TikTok</div>
+          </div>
+          <div class="vid-item-score">84</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Lakers vs Celtics Preview</div>
+            <div class="vid-item-meta">Feb 25 · YT Shorts</div>
+          </div>
+          <div class="vid-item-score">55</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Draft Pick Analysis 2026</div>
+            <div class="vid-item-meta">Feb 22 · TikTok</div>
+          </div>
+          <div class="vid-item-score">68</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">MVP Race Breakdown</div>
+            <div class="vid-item-meta">Feb 19 · Reels</div>
+          </div>
+          <div class="vid-item-score">77</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=80&h=48&fit=crop" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Court-side Vlog Day</div>
+            <div class="vid-item-meta">Feb 15 · TikTok</div>
+          </div>
+          <div class="vid-item-score">63</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=80&h=48&fit=crop&q=80" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Jersey Unboxing · Playoff Ed.</div>
+            <div class="vid-item-meta">Feb 12 · YT Shorts</div>
+          </div>
+          <div class="vid-item-score">71</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1519861531473-9200262188bf?w=80&h=48&fit=crop&q=80" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Buzzer Beater Reaction</div>
+            <div class="vid-item-meta">Feb 8 · TikTok</div>
+          </div>
+          <div class="vid-item-score">58</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1518614368389-5160c0b0de72?w=80&h=48&fit=crop&q=80" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">Trade Deadline Hot Takes</div>
+            <div class="vid-item-meta">Feb 5 · Reels</div>
+          </div>
+          <div class="vid-item-score">80</div>
+        </div>
+        <div class="vid-item">
+          <div class="vid-item-thumb"><img src="https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=80&h=48&fit=crop&q=80" alt=""/></div>
+          <div class="vid-item-info">
+            <div class="vid-item-title">All-Star Game Highlights</div>
+            <div class="vid-item-meta">Feb 1 · TikTok</div>
+          </div>
+          <div class="vid-item-score">66</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- 1. VIDEO OVERVIEW -->
+    <div class="section">
+      <div class="sec-hd">
+        <span class="sec-name">Video Overview</span>
+        <span class="vo-updated" style="font-size:11px;color:var(--t3);display:flex;align-items:center;gap:5px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.01"/>
+          </svg>
+          Last updated · 2h ago
+        </span>
+      </div>
+      <div class="video-overview">
+        <div class="vo-thumb">
+          <div class="vo-thumb-bg" style="background-image:url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=216&h=384&fit=crop')"></div>
+          <div class="vo-thumb-inner">
+            <div class="vo-play">
+              <svg width="11" height="13" viewBox="0 0 11 13" fill="none">
+                <polygon points="1,1 10,6.5 1,12" fill="var(--purple-light)"/>
+              </svg>
+            </div>
+            <span class="vo-thumb-ratio">9:16</span>
+          </div>
+        </div>
+        <div class="vo-info">
+          <div class="vo-header">
+            <div>
+              <div class="vo-title">LeBron Game-Winner Reaction — NBA Fans Clip</div>
+              <div class="vo-meta">
+                <span class="meta-text">Published Mar 5, 2026</span>
+                <span class="meta-sep">·</span>
+                <div class="platform-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 10.86 4.48A6.26 6.26 0 0 0 15.82 15V8.41a8.3 8.3 0 0 0 4.88 1.56V6.53a4.83 4.83 0 0 1-1.11.16Z"/></svg>
+                  TikTok
+                </div>
+                <span class="meta-sep">·</span>
+                <span class="meta-text">0:48 duration</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="score-row">
+            <svg width="0" height="0">
+              <defs>
+                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%"   stop-color="#8B5CF6"/>
+                  <stop offset="100%" stop-color="#C084FC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <!-- score ring -->
+            <div class="score-block">
+              <div class="ring-wrap tooltip-wrap">
+                <svg width="58" height="58" viewBox="0 0 58 58">
+                  <circle class="ring-bg"   cx="29" cy="29" r="23"/>
+                  <circle class="ring-fill" id="ringFill" cx="29" cy="29" r="23"/>
+                </svg>
+                <div class="ring-num">72</div>
+                <div class="tooltip">Composite score based on 5 metrics</div>
+              </div>
+              <div class="score-info">
+                <div class="score-lbl">Performance Score</div>
+                <div class="score-grade">Good</div>
+                <div class="score-sub">72 / 100</div>
+              </div>
+            </div>
+            <!-- summary -->
+            <div class="score-summary">
+              <!-- Overall row -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--b1);">
+                <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--t3);">Overall</div>
+                <div style="font-size:12px;font-weight:600;color:var(--purple-light);">Good · Performing above account avg</div>
+              </div>
+              <!-- Strength / Issue -->
+              <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <div style="min-width:56px;padding:2px 8px;background:var(--green-dim);border:1px solid rgba(52,211,153,0.25);border-radius:5px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);text-align:center;margin-top:1px;">Strength</div>
+                  <div style="font-size:12px;color:var(--t2);line-height:1.5;">Strong views and engagement on game-winner reaction (+22% vs account avg)</div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <div style="min-width:56px;padding:2px 8px;background:var(--orange-dim);border:1px solid rgba(251,146,60,0.25);border-radius:5px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--orange);text-align:center;margin-top:1px;">Issue</div>
+                  <div style="font-size:12px;color:var(--t2);line-height:1.5;">Mid-video drop-off at 0:23 lowering completion rate</div>
+                </div>
+              </div>
+              <div class="ss-tags">
+                <span class="tag tag-green">↑ Views +22%</span>
+                <span class="tag tag-green">↑ Engagement +5%</span>
+                <span class="tag tag-orange">↓ Completion −8%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PERFORMANCE SNAPSHOT -->
+    <div class="section">
+      <div class="sec-hd">
+        <span class="sec-name">Performance Snapshot</span>
+        <span class="sec-tag tooltip-wrap">Outcome<div class="tooltip">Layer 1 of 5-layer diagnosis model</div></span>
+      </div>
+      <div class="g4">
+        <div class="metric-card">
+          <div class="mc-lbl">Views</div>
+          <div class="mc-val">87.9K</div>
+          <div class="mc-delta"><span class="up">↑ +12%</span>&nbsp;vs last video</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-lbl">Completion Rate</div>
+          <div class="mc-val">43%</div>
+          <div class="mc-delta"><span class="down">↓ −5%</span>&nbsp;vs last video</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-lbl">Engagement Rate</div>
+          <div class="mc-val">6.2%</div>
+          <div class="mc-delta"><span class="up">↑ +1.1%</span>&nbsp;vs last video</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-lbl">Growth Indicator</div>
+          <div class="mc-val">+2.1K</div>
+          <div class="mc-delta" style="color:var(--t2)">Followers gained</div>
+        </div>
+        <div class="metric-card" style="border-color:rgba(139,92,246,0.25);">
+          <div class="mc-lbl" style="color:var(--purple-light);opacity:0.7;">Avg Watch</div>
+          <div class="mc-val" style="color:var(--purple-light);">58%</div>
+          <div class="mc-delta" style="color:var(--t3);">see retention curve ↓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CONTEXT BENCHMARK -->
+    <div class="section">
+      <div class="sec-hd">
+        <span class="sec-name">Context Benchmark</span>
+        <span class="sec-tag tooltip-wrap">Context<div class="tooltip">Layer 2 of 5-layer diagnosis model</div></span>
+      </div>
+      <div class="g2">
+        <div class="bench-card">
+          <div class="bc-title">vs Account Average <span style="font-size:10px;font-weight:400;color:var(--t3);margin-left:4px;">Account avg</span></div>
+          <div class="brow">
+            <span class="blbl">Views</span>
+            <div class="btrack"><div class="bfill pos" style="--w:80%"></div></div>
+            <span class="bval pos">+22%</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Completion</span>
+            <div class="btrack"><div class="bfill neg" style="--w:38%"></div></div>
+            <span class="bval neg">−8%</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Engagement</span>
+            <div class="btrack"><div class="bfill pos" style="--w:62%"></div></div>
+            <span class="bval pos">+5%</span>
+          </div>
+        </div>
+        <div class="bench-card" style="background:var(--s3);border-color:rgba(139,92,246,0.3);">
+          <div class="bc-title">vs Similar Videos <span style="font-size:10px;font-weight:400;color:var(--purple-light);opacity:0.7;margin-left:4px;">NBA fan creators</span></div>
+          <div class="brow">
+            <span class="blbl">Views</span>
+            <div class="btrack"><div class="bfill pos" style="--w:55%"></div></div>
+            <span class="bval pos">+10%</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Completion</span>
+            <div class="btrack"><div class="bfill neg" style="--w:30%"></div></div>
+            <span class="bval neg">−12%</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Engagement</span>
+            <div class="btrack"><div class="bfill pos" style="--w:68%"></div></div>
+            <span class="bval pos">+8%</span>
+          </div>
+        </div>
+        <div class="bench-card">
+          <div class="bc-title">vs Platform Average <span style="font-size:10px;font-weight:400;color:var(--t3);margin-left:4px;">Platform percentile</span></div>
+          <div class="brow">
+            <span class="blbl">Views</span>
+            <div class="btrack"><div class="bfill pos" style="--w:90%"></div></div>
+            <span class="bval pos" style="font-size:12px;font-weight:700;color:var(--green);">Top 20%</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Completion</span>
+            <div class="btrack"><div class="bfill neu" style="--w:50%"></div></div>
+            <span class="bval neu">Avg</span>
+          </div>
+          <div class="brow">
+            <span class="blbl">Engagement</span>
+            <div class="btrack"><div class="bfill pos" style="--w:74%"></div></div>
+            <span class="bval pos">Top 30%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. STRUCTURAL DIAGNOSIS -->
+    <div class="section">
+      <div class="sec-hd">
+        <span class="sec-name">Structural Diagnosis</span>
+        <span class="sec-tag tooltip-wrap">Structure<div class="tooltip">Layer 3 of 5-layer diagnosis model</div></span>
+      </div>
+      <div class="diag-grid">
+        <div class="diag-card" style="position:relative; padding:14px 16px;">
+          <div id="fakeCursor" class="fake-cursor"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 3.2l12.9 10.3-5.6 1.2-3.4 4.8L5.5 3.2z" fill="white" stroke="#222" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+          <div class="dc-lbl" style="margin-bottom:8px;">Retention Curve</div>
+          <svg viewBox="0 0 580 132" style="width:100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="retGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stop-color="#8B5CF6" stop-opacity="0.22"/>
+                <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.01"/>
+              </linearGradient>
+              <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%"   stop-color="#8B5CF6"/>
+                <stop offset="100%" stop-color="#C084FC"/>
+              </linearGradient>
+            </defs>
+            <!-- hook zone 0–3s (x=42 to x=83) -->
+            <g>
+              <rect x="42" y="12" width="41" height="108" fill="rgba(52,211,153,0.06)" rx="2"/>
+              <line x1="83" y1="12" x2="83" y2="120" stroke="#34D399" stroke-width="0.8" stroke-dasharray="2 2"/>
+              <rect x="44" y="14" width="46" height="13" rx="2" fill="rgba(52,211,153,0.12)" stroke="rgba(52,211,153,0.3)" stroke-width="0.5"/>
+              <text x="67" y="23" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="7" fill="#34D399">Hook 0–3s</text>
+            </g>
+            <!-- grid -->
+            <line class="grid-line" x1="42" y1="12"  x2="572" y2="12"/>
+            <line class="grid-line" x1="42" y1="45"  x2="572" y2="45"/>
+            <line class="grid-line" x1="42" y1="111" x2="572" y2="111"/>
+            <!-- 50% median line (slightly highlighted) -->
+            <line x1="42" y1="78" x2="572" y2="78" stroke="#3E3E60" stroke-width="1" stroke-dasharray="4 3"/>
+            <rect x="534" y="70" width="38" height="13" rx="2" fill="rgba(62,62,96,0.6)"/>
+            <text x="553" y="79" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="6.5" fill="#6666AA">Median</text>
+            <!-- Y labels -->
+            <text class="chart-axis" x="36" y="15"  text-anchor="end">100%</text>
+            <text class="chart-axis" x="36" y="48"  text-anchor="end">75%</text>
+            <text class="chart-axis" x="36" y="81"  text-anchor="end">50%</text>
+            <text class="chart-axis" x="36" y="114" text-anchor="end">25%</text>
+            <!-- X labels -->
+            <text class="chart-axis" x="42"  y="132" text-anchor="middle">0:00</text>
+            <text class="chart-axis" x="192" y="132" text-anchor="middle">0:23</text>
+            <text class="chart-axis" x="308" y="132" text-anchor="middle">0:36</text>
+            <text class="chart-axis" x="440" y="132" text-anchor="middle">0:48</text>
+            <!-- area -->
+            <path id="retArea" class="ret-area" d="M42,13 C70,13 100,15 130,18 C155,20 168,21 192,27
+              C214,38 224,54 250,64 C290,78 330,88 380,96
+              C415,102 430,106 440,110 L440,120 L42,120 Z"/>
+            <!-- line -->
+            <path id="retLine" class="ret-line" d="M42,13 C70,13 100,15 130,18 C155,20 168,21 192,27
+              C214,38 224,54 250,64 C290,78 330,88 380,96
+              C415,102 430,106 440,110"/>
+            <!-- drop-off annotation -->
+            <g id="dropGroup" class="drop-group">
+              <line class="drop-line" x1="192" y1="12" x2="192" y2="120"/>
+              <rect x="156" y="29" width="72" height="16" rx="3"
+                fill="rgba(251,146,60,0.12)" stroke="rgba(251,146,60,0.35)" stroke-width="0.5"/>
+              <text x="192" y="40" text-anchor="middle"
+                font-family="'JetBrains Mono',monospace" font-size="7.5" fill="#FB923C">↓ drop-off 0:23</text>
+            </g>
+            <!-- Scan cursor elements -->
+            <line id="scanLine" x1="42" y1="12" x2="42" y2="120" stroke="rgba(167,139,250,0.5)" stroke-width="1" opacity="0"/>
+            <circle id="scanDot" cx="42" cy="13" r="4.5" fill="#A78BFA" opacity="0" filter="drop-shadow(0 0 6px rgba(139,92,246,0.6))"/>
+            <g id="scanTooltip" opacity="0">
+              <rect x="0" y="0" width="80" height="30" rx="5" fill="#1A1A20" stroke="#303040" stroke-width="0.8"/>
+              <text id="ttTime" x="10" y="13" font-family="'JetBrains Mono',monospace" font-size="8" fill="#8888A0">0:00</text>
+              <text id="ttPct" x="10" y="25" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" fill="#F0F0F6">100%</text>
+            </g>
+          </svg>
+          <!-- Analysis hints row -->
+          <div style="display:flex; gap:0; margin-top:10px; border-top:1px solid var(--b1); padding-top:10px;">
+            <div style="flex:1; padding-right:14px; border-right:1px solid var(--b1);">
+              <div style="font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--t3); margin-bottom:3px;">Hook (0–3s)</div>
+              <div style="font-size:12px; font-weight:700; color:var(--green);">Strong</div>
+            </div>
+            <div style="flex:1; padding:0 14px; border-right:1px solid var(--b1);">
+              <div style="font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--t3); margin-bottom:3px;">Drop-off</div>
+              <div style="font-size:12px; font-weight:700; color:var(--orange);">0:23 mark</div>
+            </div>
+            <div style="flex:1; padding-left:14px;">
+              <div style="font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--t3); margin-bottom:3px;">Length Fit</div>
+              <div style="font-size:12px; font-weight:700; color:#FBBF24;">Slightly long</div>
+            </div>
+          </div>
+
+          <!-- Engagement Distribution + Length Match -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; border-top:1px solid var(--b1); padding-top:10px;">
+            <!-- Engagement Distribution -->
+            <div>
+              <div style="font-size:10px; font-weight:600; color:var(--t1); margin-bottom:6px;">Engagement Distribution</div>
+              <svg viewBox="0 0 220 68" style="width:100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="engGrad2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="#8B5CF6" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.08"/>
+                  </linearGradient>
+                </defs>
+                <rect x="8"   y="42" width="12" height="14" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="28"  y="28" width="12" height="28" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="48"  y="16" width="12" height="40" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="68"  y="10" width="12" height="46" rx="2" fill="#8B5CF6" fill-opacity="0.55" class="eng-bar"/>
+                <rect x="88"  y="4"  width="12" height="52" rx="2" fill="#A78BFA" fill-opacity="0.65" class="eng-bar"/>
+                <rect x="108" y="12" width="12" height="44" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="128" y="34" width="12" height="22" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="148" y="38" width="12" height="18" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="168" y="30" width="12" height="26" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <rect x="188" y="36" width="12" height="20" rx="2" fill="url(#engGrad2)" class="eng-bar"/>
+                <line x1="4" y1="58" x2="208" y2="58" stroke="#26262F" stroke-width="0.5"/>
+                <text x="6"   y="65" font-family="'JetBrains Mono',monospace" font-size="7" fill="#3E3E52">0:00</text>
+                <text x="194" y="65" font-family="'JetBrains Mono',monospace" font-size="7" fill="#3E3E52">0:48</text>
+              </svg>
+            </div>
+            <!-- Length Match -->
+            <div style="display:flex; flex-direction:column; justify-content:center;">
+              <div style="font-size:10px; font-weight:600; color:var(--t1); margin-bottom:6px;">Length Match</div>
+              <div class="lm-row" style="gap:5px;">
+                <div class="lm-labels" style="margin-bottom:0;">
+                  <span class="lm-label" style="font-size:10px;">This video</span>
+                  <span class="lm-val" style="color:var(--orange); font-size:10px;">0:48</span>
+                </div>
+                <div class="lm-track" style="height:5px;"><div class="lm-fill"></div></div>
+                <div class="lm-labels" style="margin-top:2px;">
+                  <span class="lm-label" style="font-size:10px;">TikTok optimal</span>
+                  <span class="lm-val" style="color:var(--purple-light); font-size:10px;">&lt; 0:35</span>
+                </div>
+                <div class="lm-note" style="font-size:9px; margin-top:1px;">+13s over platform optimal length</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="diag-right">
+          <div id="dropoffPanel" class="diag-card dropoff-panel">
+            <div style="display:flex; align-items:center; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--b1);">
+              <div style="width:30px; height:30px; border-radius:8px; background:var(--orange-dim); border:1px solid rgba(251,146,60,0.25); display:flex; align-items:center; justify-content:center;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"><path d="M12 9v4m0 4h.01M12 3l9.5 16.5H2.5L12 3z"/></svg>
+              </div>
+              <div>
+                <div style="font-size:13px; font-weight:600; color:var(--t1);">Drop-off Detected</div>
+                <div style="font-size:11px; color:var(--t3);">Structural Diagnosis</div>
+              </div>
+            </div>
+            <div style="background:var(--s3); border:1px solid var(--b1); border-radius:10px; padding:14px; margin-top:14px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:11px; color:var(--t2);">Drop-off point</span>
+                <span style="font-family:var(--fmono); font-size:13px; font-weight:600; color:var(--orange);">0:23</span>
+              </div>
+              <div style="height:4px; background:var(--s4); border-radius:2px; overflow:hidden; margin-bottom:12px;">
+                <div style="height:100%; width:48%; border-radius:2px; background:var(--orange);"></div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:11px; color:var(--t2);">Viewers lost after</span>
+                <span style="font-family:var(--fmono); font-size:13px; font-weight:600; color:var(--red);">−38%</span>
+              </div>
+              <div style="height:4px; background:var(--s4); border-radius:2px; overflow:hidden;">
+                <div style="height:100%; width:38%; border-radius:2px; background:var(--red);"></div>
+              </div>
+            </div>
+            <div style="background:var(--s3); border:1px solid var(--b1); border-radius:10px; padding:14px; margin-top:10px;">
+              <div style="display:inline-block; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; background:var(--orange-dim); color:var(--orange); border:1px solid rgba(251,146,60,0.25);">Finding</div>
+              <div style="font-size:12px; color:var(--t2); line-height:1.6;">
+                Completion drops sharply at <strong style="color:var(--t1); font-weight:600;">0:23</strong>. This correlates with the end of the reaction highlight — content after this point appears to lose engagement quickly.
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--purple-mid); border:1px solid rgba(139,92,246,0.35); border-radius:10px; cursor:pointer; margin-top:10px; transition:all 0.2s;">
+              <div style="width:24px; height:24px; border-radius:6px; background:rgba(139,92,246,0.2); display:flex; align-items:center; justify-content:center;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"><path d="M15.5 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8.5L15.5 3z"/><path d="M14 3v6h6"/></svg>
+              </div>
+              <span style="font-size:12px; font-weight:500; color:var(--purple-light);">Trim in Opus Editor</span>
+              <span style="margin-left:auto; font-size:14px; color:var(--purple-light);">→</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. OPTIMIZATION HINTS -->
+    <div class="section">
+      <div class="sec-hd">
+        <span class="sec-name">Optimization Hints</span>
+        <span class="sec-tag tooltip-wrap">Action<div class="tooltip">Layer 5 of 5-layer diagnosis model</div></span>
+      </div>
+      <div class="g3">
+        <div class="hint-card p1">
+          <div class="hint-top">
+            <div class="pdot"></div>
+            <span class="plbl">Priority 1</span>
+            <span class="rule-tag">Rule-based</span>
+          </div>
+          <div class="hint-title">Trim after drop-off point</div>
+          <div class="hint-desc">Completion drops sharply at 0:23. Cutting the reaction clip after the highlight moment brings it under TikTok's optimal length and should boost completion rate.</div>
+          <div class="hint-cta primary">Edit in Opus →</div>
+        </div>
+        <div class="hint-card p2">
+          <div class="hint-top">
+            <div class="pdot"></div>
+            <span class="plbl">Priority 2</span>
+            <span class="rule-tag">Rule-based</span>
+          </div>
+          <div class="hint-title">Cross-post to Instagram Reels</div>
+          <div class="hint-desc">NBA reaction content performs well on Reels. Engagement rate and format signal a stronger platform match. Benchmark shows Top 30% potential.</div>
+          <div class="hint-cta">Export for Reels →</div>
+        </div>
+        <div class="hint-card p3">
+          <div class="hint-top">
+            <div class="pdot"></div>
+            <span class="plbl">Priority 3</span>
+            <span class="rule-tag">Rule-based</span>
+          </div>
+          <div class="hint-title">Reinforce hook with text overlay</div>
+          <div class="hint-desc">First 3 seconds show strong retention. Adding "LEBRON GAME WINNER" text overlay in the opening may further reduce early swipe-away rate.</div>
+          <div class="hint-cta">Add overlay →</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- end .layout -->
+</div><!-- end #page-platform -->
+
+</div><!-- end #page-wrap -->
+
+<script>
+  // Score ring animation
+  (function() {
+    const el = document.getElementById('ringFill');
+    if (!el) return;
+    const r    = 23;
+    const circ = 2 * Math.PI * r;
+    const end  = circ * (1 - 72 / 100);
+    el.style.strokeDasharray  = circ;
+    el.style.strokeDashoffset = circ;
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        el.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)';
+        el.style.strokeDashoffset = end;
+      }, 300);
+    });
+  })();
+
+  // Sidebar filter interaction with smooth radio animation
+  document.querySelectorAll('.fi').forEach(item => {
+    item.addEventListener('click', function() {
+      const list = this.closest('.filter-list');
+      list.querySelectorAll('.fi').forEach(f => f.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Sidebar video item click
+  document.querySelectorAll('.vid-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.vid-item').forEach(v => v.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // ── PAGE SWITCHING ──
+  const pageMap = {
+    'overview':    document.getElementById('page-overview'),
+    'platform':    document.getElementById('page-platform'),
+  };
+  let currentPage = 'platform';
+
+  function switchPage(targetKey) {
+    if (targetKey === currentPage) return;
+
+    const targetEl = pageMap[targetKey];
+    const currentEl = pageMap[currentPage];
+    if (!targetEl) return;
+
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector(`[data-page="${targetKey}"]`).classList.add('active');
+
+    currentEl.classList.add('page-exit');
+
+    setTimeout(() => {
+      currentEl.classList.add('page-hidden');
+      currentEl.classList.remove('page-exit');
+
+      targetEl.classList.remove('page-hidden');
+      targetEl.classList.add('page-enter');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          targetEl.classList.remove('page-enter');
+        });
+      });
+
+      currentPage = targetKey;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 220);
+  }
+
+  document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+    link.addEventListener('click', function() {
+      const page = this.dataset.page;
+      if (pageMap[page]) {
+        switchPage(page);
+      }
+    });
+  });
+
+  // Engagement bar hover effect
+  document.querySelectorAll('.eng-bar').forEach(bar => {
+    bar.style.transition = 'opacity 0.2s';
+    bar.style.cursor = 'pointer';
+    bar.addEventListener('mouseenter', function() {
+      document.querySelectorAll('.eng-bar').forEach(b => { b.style.opacity = '0.4'; });
+      this.style.opacity = '1';
+    });
+    bar.addEventListener('mouseleave', function() {
+      document.querySelectorAll('.eng-bar').forEach(b => { b.style.opacity = '1'; });
+    });
+  });
+
+  // ── STRUCTURAL DIAGNOSIS: static state at drop-off ──
+  (function() {
+    const svg       = document.querySelector('.diag-card svg');
+    const scanLine  = document.getElementById('scanLine');
+    const scanDot   = document.getElementById('scanDot');
+    const scanTooltip = document.getElementById('scanTooltip');
+    const ttTime    = document.getElementById('ttTime');
+    const ttPct     = document.getElementById('ttPct');
+    const dropGroup = document.getElementById('dropGroup');
+    if (!svg || !scanLine) return;
+
+    const DROPOFF_X = 192;
+    function getRetention(x) {
+      const t = (x - 42) / (440 - 42);
+      if (t <= 0) return 100;
+      if (t < 0.08) return 100 - t * 30;
+      if (t < 0.25) return 97.6 - (t - 0.08) * 70;
+      if (t < 0.38) return 85.7 - (t - 0.25) * 220;
+      if (t < 0.52) return 57.1 - (t - 0.38) * 100;
+      if (t < 0.75) return 43.1 - (t - 0.52) * 50;
+      return 31.6 - (t - 0.75) * 35;
+    }
+    const pct = getRetention(DROPOFF_X);
+    const svgY = 12 + (100 - pct) * (108 / 100);
+    scanLine.setAttribute('x1', DROPOFF_X);
+    scanLine.setAttribute('x2', DROPOFF_X);
+    scanLine.setAttribute('opacity', '1');
+    scanDot.setAttribute('cx', DROPOFF_X);
+    scanDot.setAttribute('cy', svgY);
+    scanDot.setAttribute('opacity', '1');
+    scanTooltip.setAttribute('opacity', '1');
+    scanTooltip.setAttribute('transform', `translate(${DROPOFF_X + 10}, ${svgY - 36})`);
+    ttTime.textContent = '0:18';
+    ttPct.textContent = Math.round(pct) + '%';
+    dropGroup.classList.add('visible');
+  })();
+</script>
+</body>
+</html>

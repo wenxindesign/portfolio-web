@@ -39,16 +39,18 @@ export default function PlayPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-16 pb-20">
-        <h1 className="font-thicccboi text-3xl md:text-4xl lg:text-5xl leading-snug max-w-3xl tracking-[-0.02em]">
-          <span className="text-secondary italic">I also design, research & paint </span>
+      <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-28 pb-20">
+        <h1 className="font-thicccboi text-3xl md:text-4xl lg:text-5xl leading-snug tracking-[-0.02em] whitespace-nowrap">
+          <span className="text-secondary">I also design, research &amp; paint </span>
           <span className="text-primary font-bold">places</span>
         </h1>
-        <p className="font-thicccboi text-2xl md:text-3xl lg:text-4xl text-secondary tracking-[-0.02em] mt-2">
-          where you feel a <span className="text-primary font-bold">presence</span>.
+        <p className="font-thicccboi text-3xl md:text-4xl lg:text-5xl tracking-[-0.02em] mt-2">
+          <span className="text-secondary">where you feel a </span>
+          <span className="text-primary font-bold">presence</span>
+          <span className="text-secondary">.</span>
         </p>
         <p className="text-secondary mt-4 max-w-3xl text-lg">
-          Uncover the <strong>perception</strong> and <strong>physicality</strong> of space by generating visualized mapping, data, model, artwork, and more.
+          Uncover the <strong className="text-primary">perception</strong> and <strong className="text-primary">physicality</strong> of space by generating visualized mapping, data, model, artwork, and more.
         </p>
       </section>
 

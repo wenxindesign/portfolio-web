@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <title>Prototype 2 — Performance Snapshot → AI Findings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0D0D11; --s1: #141418; --s2: #1A1A20; --s3: #202028; --s4: #26262F;
+      --b1: #26262F; --b2: #303040; --b3: #3E3E52;
+      --purple: #8B5CF6; --purple-light: #A78BFA; --purple-dim: rgba(139,92,246,0.10);
+      --purple-mid: rgba(139,92,246,0.18); --purple-glow: rgba(139,92,246,0.35);
+      --green: #34D399; --green-dim: rgba(52,211,153,0.10);
+      --orange: #FB923C; --orange-dim: rgba(251,146,60,0.10);
+      --red: #F87171; --red-dim: rgba(248,113,113,0.08);
+      --t1: #F0F0F6; --t2: #8888A0; --t3: #4A4A62; --t4: #2E2E40;
+      --f: 'Inter', -apple-system, sans-serif;
+      --fmono: 'JetBrains Mono', monospace;
+    }
+    body {
+      background: transparent; font-family: var(--f); color: var(--t1);
+      -webkit-font-smoothing: antialiased;
+      display: flex; align-items: flex-start; justify-content: flex-start;
+      padding: 20px; overflow: hidden;
+    }
+
+    .proto { width: 100%; max-width: 920px; }
+
+    /* ── Main Layout ── */
+    .main-layout {
+      display: flex; gap: 16px; align-items: stretch;
+    }
+
+    /* ── Left: Metric Cards ── */
+    .metrics-panel {
+      flex: 1; display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    }
+
+    .metric-card {
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 12px; padding: 16px 14px;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+      opacity: 0; transform: translateY(8px);
+    }
+    .metric-card.visible {
+      opacity: 1; transform: translateY(0);
+    }
+    .metric-card.highlight {
+      border-color: rgba(139,92,246,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(139,92,246,0.15);
+    }
+    .mc-lbl {
+      font-size: 11px; font-weight: 500; color: var(--t2);
+      margin-bottom: 8px;
+    }
+    .mc-val {
+      font-family: var(--fmono); font-size: 24px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px;
+      transition: color 0.3s;
+    }
+    .mc-val.counting { color: var(--purple-light); }
+    .mc-delta {
+      font-size: 10px; color: var(--t2);
+      display: flex; align-items: center; gap: 4px;
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .mc-delta.visible { opacity: 1; }
+    .up { color: var(--green); }
+    .down { color: var(--red); }
+
+    /* ── Sparkline in last card ── */
+    .spark-bar {
+      display: flex; gap: 2px; align-items: flex-end; height: 28px; margin-top: 6px;
+    }
+    .spark-bar div {
+      flex: 1; background: var(--purple-dim); border-radius: 2px;
+      transition: height 0.5s ease, background 0.3s;
+    }
+    .spark-bar div.active { background: var(--purple); }
+
+    /* ── Right: AI Findings Panel ── */
+    .findings-panel {
+      width: 320px; min-width: 320px;
+      background: var(--s2); border: 1px solid var(--b1);
+      border-radius: 14px; padding: 18px;
+      display: flex; flex-direction: column; gap: 14px;
+      opacity: 0; transform: translateX(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .findings-panel.visible { opacity: 1; transform: translateX(0); }
+
+    .fp-header {
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--b1);
+    }
+    .fp-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--purple-dim); border: 1px solid rgba(139,92,246,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .fp-title { font-size: 13px; font-weight: 600; color: var(--t1); }
+    .fp-sub { font-size: 11px; color: var(--t3); }
+
+    /* Score ring */
+    .score-row {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--s3); border: 1px solid var(--b1);
+      border-radius: 10px; padding: 14px;
+    }
+    .ring-wrap {
+      position: relative; flex-shrink: 0;
+    }
+    .ring-wrap svg { display: block; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--b2); stroke-width: 4; }
+    .ring-fill {
+      fill: none; stroke: url(#ringGrad); stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 138; stroke-dashoffset: 138;
+      transition: stroke-dashoffset 1.2s ease;
+      filter: drop-shadow(0 0 5px var(--purple-glow));
+    }
+    .ring-fill.drawn { stroke-dashoffset: 39; /* 72% of 138 ≈ 99, so offset = 138-99=39 */ }
+    .ring-num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--fmono); font-size: 16px; font-weight: 600; color: var(--t1);
+    }
+    .score-info { display: flex; flex-direction: column; gap: 2px; }
+    .score-lbl {
+      font-size: 9px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--t3);
+    }
+    .score-grade { font-size: 17px; font-weight: 700; color: var(--purple-light); letter-spacing: -0.02em; }
+    .score-sub { font-size: 11px; color: var(--t2); }
+
+    /* Finding items */
+    .finding-item {
+      background: var(--s3); border: 1px solid var(--b1);
+      border-radius: 10px; padding: 12px 14px;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .finding-item.visible { opacity: 1; transform: translateY(0); }
+
+    .fi-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 6px;
+    }
+    .fi-badge.strength {
+      background: var(--green-dim); color: var(--green);
+      border: 1px solid rgba(52,211,153,0.25);
+    }
+    .fi-badge.issue {
+      background: var(--orange-dim); color: var(--orange);
+      border: 1px solid rgba(251,146,60,0.25);
+    }
+    .fi-text { font-size: 11px; color: var(--t2); line-height: 1.55; }
+    .fi-text strong { color: var(--t1); font-weight: 600; }
+
+    /* Tags row */
+    .tags-row {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    .tags-row.visible { opacity: 1; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 500;
+    }
+    .tag-green {
+      background: var(--green-dim); color: var(--green);
+      border: 1px solid rgba(52,211,153,0.2);
+    }
+    .tag-orange {
+      background: var(--orange-dim); color: var(--orange);
+      border: 1px solid rgba(251,146,60,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="proto">
+    <div class="main-layout">
+      <!-- Left: Metric Cards -->
+      <div class="metrics-panel">
+        <div class="metrics-grid">
+          <div class="metric-card" id="mc0">
+            <div class="mc-lbl">Views</div>
+            <div class="mc-val" id="val0">—</div>
+            <div class="mc-delta" id="delta0"><span class="up">↑ +12%</span>&nbsp;vs last video</div>
+          </div>
+          <div class="metric-card" id="mc1">
+            <div class="mc-lbl">Completion Rate</div>
+            <div class="mc-val" id="val1">—</div>
+            <div class="mc-delta" id="delta1"><span class="down">↓ −5%</span>&nbsp;vs last video</div>
+          </div>
+          <div class="metric-card" id="mc2">
+            <div class="mc-lbl">Engagement Rate</div>
+            <div class="mc-val" id="val2">—</div>
+            <div class="mc-delta" id="delta2"><span class="up">↑ +1.1%</span>&nbsp;vs last video</div>
+          </div>
+          <div class="metric-card" id="mc3">
+            <div class="mc-lbl">Growth Indicator</div>
+            <div class="mc-val" id="val3">—</div>
+            <div class="mc-delta" id="delta3" style="color:var(--t2)">Followers gained</div>
+          </div>
+          <div class="metric-card" id="mc4">
+            <div class="mc-lbl" style="color:var(--purple-light);opacity:0.7;">Avg Watch</div>
+            <div class="mc-val" id="val4" style="color:var(--purple-light);">—</div>
+            <div class="mc-delta" id="delta4" style="color:var(--t3);">see retention curve ↓</div>
+          </div>
+          <div class="metric-card" id="mc5">
+            <div class="mc-lbl">7-Day Trend</div>
+            <div class="spark-bar" id="sparkBar">
+              <div style="height:40%"></div>
+              <div style="height:55%"></div>
+              <div style="height:35%"></div>
+              <div style="height:70%"></div>
+              <div style="height:85%"></div>
+              <div style="height:65%"></div>
+              <div style="height:100%" class="active"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: AI Findings Panel -->
+      <div id="findingsPanel" class="findings-panel">
+        <svg width="0" height="0">
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#8B5CF6"/>
+              <stop offset="100%" stop-color="#C084FC"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div class="fp-header">
+          <div class="fp-icon">🧠</div>
+          <div>
+            <div class="fp-title">AI Performance Analysis</div>
+            <div class="fp-sub">5 metrics analyzed</div>
+          </div>
+        </div>
+
+        <div class="score-row">
+          <div class="ring-wrap">
+            <svg width="50" height="50" viewBox="0 0 50 50">
+              <circle class="ring-bg" cx="25" cy="25" r="22"/>
+              <circle class="ring-fill" id="ringFill" cx="25" cy="25" r="22"/>
+            </svg>
+            <div class="ring-num" id="ringNum">—</div>
+          </div>
+          <div class="score-info">
+            <div class="score-lbl">Performance Score</div>
+            <div class="score-grade" id="scoreGrade">—</div>
+            <div class="score-sub" id="scoreSub">Analyzing...</div>
+          </div>
+        </div>
+
+        <div class="finding-item" id="finding0">
+          <div class="fi-badge strength">Strength</div>
+          <div class="fi-text">
+            <strong>Strong views and engagement</strong> on game-winner reaction (+22% vs account avg)
+          </div>
+        </div>
+
+        <div class="finding-item" id="finding1">
+          <div class="fi-badge issue">Issue</div>
+          <div class="fi-text">
+            <strong>Mid-video drop-off at 0:23</strong> lowering completion rate. 18% viewer loss in 4-second window.
+          </div>
+        </div>
+
+        <div class="tags-row" id="tagsRow">
+          <span class="tag tag-green">↑ Views +22%</span>
+          <span class="tag tag-green">↑ Engagement +5%</span>
+          <span class="tag tag-orange">↓ Completion −8%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cards = [
+      document.getElementById('mc0'),
+      document.getElementById('mc1'),
+      document.getElementById('mc2'),
+      document.getElementById('mc3'),
+      document.getElementById('mc4'),
+      document.getElementById('mc5'),
+    ];
+    const vals = [
+      document.getElementById('val0'),
+      document.getElementById('val1'),
+      document.getElementById('val2'),
+      document.getElementById('val3'),
+      document.getElementById('val4'),
+    ];
+    const deltas = [
+      document.getElementById('delta0'),
+      document.getElementById('delta1'),
+      document.getElementById('delta2'),
+      document.getElementById('delta3'),
+      document.getElementById('delta4'),
+    ];
+    const findingsPanel = document.getElementById('findingsPanel');
+    const ringFill = document.getElementById('ringFill');
+    const ringNum = document.getElementById('ringNum');
+    const scoreGrade = document.getElementById('scoreGrade');
+    const scoreSub = document.getElementById('scoreSub');
+    const finding0 = document.getElementById('finding0');
+    const finding1 = document.getElementById('finding1');
+    const tagsRow = document.getElementById('tagsRow');
+
+    const targetVals = ['87.9K', '43%', '6.2%', '+2.1K', '58%'];
+    const countSteps = [
+      ['0', '12.3K', '34.7K', '56.2K', '72.1K', '87.9K'],
+      ['0%', '8%', '19%', '31%', '38%', '43%'],
+      ['0%', '1.2%', '2.8%', '4.1%', '5.5%', '6.2%'],
+      ['+0', '+0.4K', '+0.9K', '+1.4K', '+1.8K', '+2.1K'],
+      ['0%', '11%', '24%', '38%', '49%', '58%'],
+    ];
+
+    function resetAll() {
+      cards.forEach(c => { c.classList.remove('visible'); c.classList.remove('highlight'); });
+      cards.forEach(c => { c.style.transition = 'none'; });
+      void cards[0].offsetWidth;
+      cards.forEach(c => { c.style.transition = ''; });
+
+      vals.forEach((v, i) => { v.textContent = '—'; v.classList.remove('counting'); });
+      deltas.forEach(d => d.classList.remove('visible'));
+
+      findingsPanel.classList.remove('visible');
+      ringFill.classList.remove('drawn');
+      ringNum.textContent = '—';
+      scoreGrade.textContent = '—';
+      scoreSub.textContent = 'Analyzing...';
+      finding0.classList.remove('visible');
+      finding1.classList.remove('visible');
+      tagsRow.classList.remove('visible');
+    }
+
+    function animateCount(valEl, steps, duration) {
+      const stepTime = duration / steps.length;
+      valEl.classList.add('counting');
+      steps.forEach((s, i) => {
+        setTimeout(() => {
+          valEl.textContent = s;
+          if (i === steps.length - 1) valEl.classList.remove('counting');
+        }, stepTime * i);
+      });
+    }
+
+    function runAnimation() {
+      resetAll();
+
+      // Step 1: Cards appear one by one (staggered)
+      cards.forEach((c, i) => {
+        setTimeout(() => {
+          c.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          c.classList.add('visible');
+        }, 100 + i * 120);
+      });
+
+      // Step 2: Count up values (after cards appear)
+      setTimeout(() => {
+        vals.forEach((v, i) => {
+          animateCount(v, countSteps[i], 800);
+        });
+      }, 800);
+
+      // Step 3: Deltas appear
+      setTimeout(() => {
+        deltas.forEach((d, i) => {
+          setTimeout(() => d.classList.add('visible'), i * 80);
+        });
+      }, 1700);
+
+      // Step 3b: Highlight issue card (completion rate)
+      setTimeout(() => {
+        cards[1].classList.add('highlight');
+      }, 2000);
+
+      // Step 4: Findings panel slides in
+      setTimeout(() => {
+        findingsPanel.classList.add('visible');
+      }, 2400);
+
+      // Step 4b: Ring animates
+      setTimeout(() => {
+        ringFill.classList.add('drawn');
+        // Count up ring number
+        let count = 0;
+        const interval = setInterval(() => {
+          count += 3;
+          if (count >= 72) { count = 72; clearInterval(interval); }
+          ringNum.textContent = count;
+        }, 40);
+        scoreGrade.textContent = 'Good';
+        scoreSub.textContent = '72 / 100';
+      }, 2800);
+
+      // Step 5: Findings appear
+      setTimeout(() => finding0.classList.add('visible'), 3400);
+      setTimeout(() => finding1.classList.add('visible'), 3800);
+
+      // Step 6: Tags appear
+      setTimeout(() => tagsRow.classList.add('visible'), 4200);
+    }
+
+    function loopAnimation() {
+      runAnimation();
+      // Hold 3s then fade out
+      setTimeout(() => {
+        findingsPanel.classList.remove('visible');
+        tagsRow.classList.remove('visible');
+        finding1.classList.remove('visible');
+        finding0.classList.remove('visible');
+        cards.forEach(c => {
+          c.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          c.classList.remove('visible');
+        });
+      }, 7200);
+
+      setTimeout(() => {
+        resetAll();
+        loopAnimation();
+      }, 8200);
+    }
+
+    setTimeout(loopAnimation, 300);
+  </script>
+</body>
+</html>

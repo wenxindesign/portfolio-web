@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #142040;
+}
+
+.bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 70% at 48% 35%, rgba(22,38,72,0.9) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 45% at 70% 70%, rgba(55,25,105,0.08) 0%, transparent 50%);
+}
+
+/* Strong purple glow bottom-right, matching material.png */
+.glow-purple {
+  position: absolute;
+  right: 8%; bottom: -5%;
+  width: 500px; height: 450px;
+  background: radial-gradient(circle, rgba(120,55,210,0.35) 0%, rgba(90,40,170,0.12) 35%, transparent 65%);
+  filter: blur(60px);
+}
+
+/* Subtle blue glow top-left */
+.glow-blue {
+  position: absolute;
+  left: 10%; top: 10%;
+  width: 300px; height: 250px;
+  background: radial-gradient(circle, rgba(30,50,120,0.15) 0%, transparent 60%);
+  filter: blur(40px);
+}
+
+.scene {
+  position: absolute; inset: 0;
+  perspective: 1500px;
+  perspective-origin: 50% 40%;
+}
+
+/* Main laptop transform */
+.laptop {
+  position: absolute;
+  left: 48%; top: 38%;
+  transform-style: preserve-3d;
+  transform:
+    translate(-50%, -50%)
+    scale(1.35)
+    rotateY(-26deg)
+    rotateX(-10deg)
+    rotateZ(2deg);
+}
+
+/* SCREEN LID */
+.lid {
+  position: relative;
+  width: 780px; height: 510px;
+  transform-style: preserve-3d;
+}
+
+.lid-face {
+  position: absolute; inset: 0;
+  background: #080808;
+  border-radius: 15px;
+  box-shadow: 0 0 0 1px rgba(55,55,55,0.5), 0 0 100px rgba(0,0,0,0.25);
+}
+
+.display {
+  position: absolute;
+  top: 11px; left: 11px; right: 11px; bottom: 11px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #0D0D11;
+}
+
+.display img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.glass-overlay {
+  position: absolute;
+  top: 11px; left: 11px; right: 11px; bottom: 11px;
+  border-radius: 7px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.055) 0%,
+    rgba(255,255,255,0.015) 22%,
+    transparent 50%
+  );
+  z-index: 4;
+}
+
+/* Screen edges (thickness) */
+.lid-left {
+  position: absolute;
+  top: 6px; bottom: 6px; left: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #b8b8bb 0%, #8a8a8e 50%, #a5a5a9 100%);
+  transform: rotateY(-90deg) translateZ(3px);
+  transform-origin: right center;
+  border-radius: 3px 0 0 3px;
+}
+
+.lid-top {
+  position: absolute;
+  top: 0; left: 6px; right: 6px; height: 6px;
+  background: linear-gradient(90deg, #a5a5a9 0%, #bfbfc3 50%, #a5a5a9 100%);
+  transform: rotateX(90deg) translateZ(3px);
+  transform-origin: bottom center;
+  border-radius: 3px 3px 0 0;
+}
+
+/* HINGE */
+.hinge {
+  width: 780px; height: 7px;
+  background: linear-gradient(90deg, #606064 0%, #909094 35%, #909094 65%, #606064 100%);
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  transform-style: preserve-3d;
+}
+
+/* BODY - steep angle */
+.base {
+  width: 840px; margin-left: -30px;
+  height: 4px;
+  transform-style: preserve-3d;
+  transform: rotateX(85deg);
+  transform-origin: top center;
+}
+
+.base-deck {
+  position: absolute;
+  width: 100%; height: 500px;
+  background: linear-gradient(180deg, #cdcdd1 0%, #b8b8bc 40%, #acacb0 100%);
+  border-radius: 2px 2px 14px 14px;
+  box-shadow: 0 5px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.65);
+}
+
+.kb {
+  position: absolute;
+  top: 16px; left: 46px; right: 46px; height: 235px;
+  background: #181818;
+  border-radius: 5px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 3px;
+  padding: 8px 6px;
+}
+
+.kb-row {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+.key {
+  flex: 1;
+  background: linear-gradient(180deg, #2e2e30 0%, #252527 60%, #1e1e20 100%);
+  border-radius: 3px;
+  box-shadow:
+    0 1px 0 rgba(60,60,62,0.5),
+    inset 0 0.5px 0 rgba(80,80,82,0.3),
+    0 1px 2px rgba(0,0,0,0.3);
+  min-width: 0;
+}
+
+/* Special key widths */
+.key-esc { flex: 0.75; }
+.key-fn { flex: 0.68; }
+.key-tab { flex: 1.5; }
+.key-caps { flex: 1.8; }
+.key-shift-l { flex: 2.3; }
+.key-shift-r { flex: 2.3; }
+.key-ctrl { flex: 1.3; }
+.key-opt { flex: 1.1; }
+.key-cmd { flex: 1.3; }
+.key-space { flex: 6; }
+.key-enter { flex: 2.2; }
+.key-backsp { flex: 1.5; }
+.key-wide { flex: 1.8; }
+
+/* Touch bar row */
+.kb-touchbar {
+  display: flex;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.touchbar-esc {
+  flex: 0 0 40px;
+  background: linear-gradient(180deg, #2a2a2c 0%, #1c1c1e 100%);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.touchbar-strip {
+  flex: 1;
+  background: linear-gradient(90deg, #111 0%, #1a1a1c 20%, #1a1a1c 80%, #111 100%);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.touchbar-strip::after {
+  content: '';
+  position: absolute;
+  top: 30%; left: 60%; right: 5%; bottom: 30%;
+  background: linear-gradient(90deg,
+    rgba(80,80,82,0.2) 0%,
+    rgba(60,60,62,0.15) 30%,
+    rgba(100,100,102,0.2) 60%,
+    rgba(60,60,62,0.1) 100%
+  );
+  border-radius: 6px;
+}
+
+.tp {
+  position: absolute;
+  top: 270px; left: 50%; transform: translateX(-50%);
+  width: 290px; height: 172px;
+  background: linear-gradient(180deg, #c8c8cc 0%, #bcbcc0 50%, #b4b4b8 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(0,0,0,0.08),
+    inset 0 1px 2px rgba(255,255,255,0.15),
+    0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ======= CRYSTAL BLOCK ======= */
+.crystal-wrap {
+  position: absolute;
+  left: 53%; bottom: 30px;
+  transform: translateX(-50%) scale(1.3) perspective(900px) rotateY(-14deg) rotateX(5deg);
+}
+
+.crystal-body {
+  position: relative;
+  width: 580px; height: 140px;
+  border-radius: 12px;
+  background: linear-gradient(145deg,
+    rgba(145, 105, 235, 0.24) 0%,
+    rgba(105, 75, 205, 0.14) 20%,
+    rgba(75, 65, 175, 0.09) 40%,
+    rgba(85, 75, 185, 0.13) 60%,
+    rgba(135, 95, 225, 0.22) 80%,
+    rgba(165, 115, 245, 0.3) 100%
+  );
+  border: 1px solid rgba(185, 145, 255, 0.17);
+  box-shadow:
+    0 18px 70px rgba(85, 45, 165, 0.32),
+    0 8px 28px rgba(105, 65, 205, 0.2),
+    inset 0 2px 1px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 1px rgba(65, 35, 125, 0.12),
+    inset 0 0 60px rgba(105, 65, 205, 0.04);
+  overflow: hidden;
+}
+
+/* Top highlight */
+.crystal-body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.1) 0%,
+    rgba(255,255,255,0.025) 55%,
+    transparent 100%
+  );
+  border-radius: 12px 12px 0 0;
+}
+
+/* Light refraction */
+.crystal-body::after {
+  content: '';
+  position: absolute;
+  top: 16%; left: 5%; width: 28%; height: 16%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.07) 0%, transparent 100%);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+/* Internal light streaks */
+.streak {
+  position: absolute;
+  top: 38%; left: 12%; width: 55%; height: 1.5px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(200, 165, 255, 0.1) 15%,
+    rgba(200, 165, 255, 0.05) 65%,
+    transparent 100%
+  );
+  filter: blur(1px);
+}
+
+.streak2 {
+  position: absolute;
+  top: 58%; left: 30%; width: 40%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(180, 145, 240, 0.08) 20%,
+    rgba(180, 145, 240, 0.04) 70%,
+    transparent 100%
+  );
+  filter: blur(1px);
+}
+
+/* Crystal right face */
+.crystal-side {
+  position: absolute;
+  top: -3px; right: -18px;
+  width: 18px; height: calc(100% + 6px);
+  background: linear-gradient(180deg,
+    rgba(125, 85, 215, 0.38) 0%,
+    rgba(95, 60, 185, 0.24) 50%,
+    rgba(125, 85, 215, 0.38) 100%
+  );
+  transform: skewY(-5deg);
+  transform-origin: top left;
+  border-right: 1px solid rgba(185, 145, 255, 0.1);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Crystal top face */
+.crystal-cap {
+  position: absolute;
+  top: -12px; left: 5px; right: -12px; height: 14px;
+  background: linear-gradient(90deg,
+    rgba(175, 135, 255, 0.16) 0%,
+    rgba(145, 105, 225, 0.1) 50%,
+    rgba(175, 135, 255, 0.18) 100%
+  );
+  transform: skewX(4deg);
+  border-radius: 8px 8px 0 0;
+  border-top: 1px solid rgba(215, 175, 255, 0.12);
+}
+
+/* Floor effects */
+.floor-reflect {
+  position: absolute;
+  left: 53%; bottom: 25px;
+  transform: translateX(-50%);
+  width: 540px; height: 40px;
+  background: radial-gradient(ellipse 100% 100%, rgba(115, 65, 205, 0.15) 0%, transparent 70%);
+  filter: blur(22px);
+}
+
+.laptop-shadow {
+  position: absolute;
+  left: 49%; bottom: 95px;
+  transform: translateX(-50%);
+  width: 650px; height: 28px;
+  background: radial-gradient(ellipse 100% 100%, rgba(0,0,0,0.22) 0%, transparent 60%);
+  filter: blur(18px);
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="glow-purple"></div>
+<div class="glow-blue"></div>
+
+<div class="scene">
+  <div class="laptop-shadow"></div>
+  <div class="floor-reflect"></div>
+
+  <!-- Crystal -->
+  <div class="crystal-wrap">
+    <div class="crystal-body">
+      <div class="streak"></div>
+      <div class="streak2"></div>
+    </div>
+    <div class="crystal-side"></div>
+    <div class="crystal-cap"></div>
+  </div>
+
+  <!-- Laptop -->
+  <div class="laptop">
+    <div class="lid">
+      <div class="lid-face">
+        <div class="display"><img src="/hifi_v2_command-center.jpeg" alt="OpusClip"></div>
+        <div class="glass-overlay"></div>
+      </div>
+      <div class="lid-left"></div>
+      <div class="lid-top"></div>
+    </div>
+    <div class="hinge"></div>
+    <div class="base">
+      <div class="base-deck">
+        <div class="kb">
+          <!-- Touch Bar -->
+          <div class="kb-touchbar">
+            <div class="touchbar-esc"></div>
+            <div class="touchbar-strip"></div>
+          </div>
+          <!-- Row 1: number keys -->
+          <div class="kb-row">
+            <div class="key key-wide"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key key-backsp"></div>
+          </div>
+          <!-- Row 2: QWERTY -->
+          <div class="kb-row">
+            <div class="key key-tab"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key key-wide"></div>
+          </div>
+          <!-- Row 3: ASDF -->
+          <div class="kb-row">
+            <div class="key key-caps"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key key-enter"></div>
+          </div>
+          <!-- Row 4: ZXCV -->
+          <div class="kb-row">
+            <div class="key key-shift-l"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key key-shift-r"></div>
+          </div>
+          <!-- Row 5: bottom row -->
+          <div class="kb-row">
+            <div class="key key-fn"></div>
+            <div class="key key-ctrl"></div>
+            <div class="key key-opt"></div>
+            <div class="key key-cmd"></div>
+            <div class="key key-space"></div>
+            <div class="key key-cmd"></div>
+            <div class="key key-opt"></div>
+            <div class="key key-fn"></div>
+            <div class="key key-fn"></div>
+            <div class="key key-fn"></div>
+            <div class="key key-fn"></div>
+          </div>
+        </div>
+        <div class="tp"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

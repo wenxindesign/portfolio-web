@@ -11,9 +11,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const caseStudies = [
+    { name: "Opus Clip", href: "/work/opus-clip" },
     { name: "DrayEasy", href: "/work/drayeasy" },
     { name: "Sanctify", href: "/work/sanctify" },
-    { name: "Opus Clip", href: "/work/opus-clip" },
   ];
 
   const isActive = (path: string) => pathname === path;
@@ -45,17 +45,21 @@ export default function Navbar() {
               CASE STUDY
             </button>
             {caseStudyOpen && (
-              <div className="absolute top-full left-0 pt-2">
-                <div className="bg-surface rounded-lg shadow-lg border border-black/5 py-2 min-w-[180px]">
-                  {caseStudies.map((study) => (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3">
+                <div className="bg-white/80 rounded-lg shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] border border-black/[0.04] py-1.5 min-w-[200px] backdrop-blur-xl">
+                  {caseStudies.map((study, i) => (
                     <Link
                       key={study.href}
                       href={study.href}
-                      className={`block px-4 py-2.5 text-sm normal-case tracking-normal transition-colors hover:bg-background ${
-                        isActive(study.href) ? "text-primary font-semibold" : "text-secondary"
+                      className={`group flex items-center gap-3 px-4 py-2.5 text-sm normal-case tracking-normal transition-all duration-200 hover:bg-[#f8f7fb] ${
+                        isActive(study.href) ? "text-primary font-medium" : "text-secondary"
                       }`}
                     >
-                      {study.name}
+                      <span className="text-accent/70 text-xs font-mono">0{i + 1}</span>
+                      <span className="group-hover:text-primary transition-colors">{study.name}</span>
+                      <svg className="w-3 h-3 ml-auto opacity-0 -translate-x-1 group-hover:opacity-40 group-hover:translate-x-0 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </Link>
                   ))}
                 </div>

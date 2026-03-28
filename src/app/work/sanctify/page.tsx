@@ -46,7 +46,7 @@ const sections = [
         <p><strong>My role</strong></p>
         <p>I participated in the research, ideation, user flow, and wireframe processes with four other designers. I primarily designed the app&apos;s homepage. During the design process, I worked closely with the client&apos;s representatives to continuously update and iterate on the product.</p>
         <div className="bg-accent/5 rounded-xl p-6 my-6">
-          <p className="font-thicccboi text-xl font-medium tracking-[-0.02em] text-accent mb-2">Meaningful impact</p>
+          <p className="font-thicccboi text-xl font-bold tracking-[-0.02em] text-accent mb-2">Meaningful impact</p>
           <p>We saved <strong>40%</strong> of the drop-off rate.</p>
           <p>Over <strong>20,000</strong> new users have signed up to join the waitlist.</p>
         </div>
@@ -175,7 +175,7 @@ const sections = [
     title: "Final Solutions",
     content: (
       <SectionText>
-        <p className="font-thicccboi text-xl font-medium tracking-[-0.02em]">Home as a versatile and personalized hub</p>
+        <p className="font-thicccboi text-xl font-bold tracking-[-0.02em]">Home as a versatile and personalized hub</p>
         <p className="font-semibold mt-6">From uncandid to informative</p>
         <p>50% of users were unsure how screening works. We proposed transparent screen reports, smart collections under FFV scorecard, and browsing through FFV score card collections.</p>
         <SectionImage src="/images/sanctify/1_Screen_reports_3.gif" alt="Screen reports solution" />
@@ -232,7 +232,7 @@ const sections = [
 export default function SanctifyPage() {
   return (
     <CaseStudyLayout
-      title="Sanctify"
+      title={<><span className="text-primary font-medium">Sanctify</span>{" — "}<span className="text-secondary font-semibold">Faith-Based Investing</span></>}
       subtitle="Launching a convenient and delightful investment app that lets you make well-informed decisions in line with Catholic values."
       tags={["B2C Fintech", "Award winning", "Launched in 2023"]}
       heroImage="/images/sanctify/Display.png"

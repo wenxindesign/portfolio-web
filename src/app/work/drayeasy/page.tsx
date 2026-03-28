@@ -42,7 +42,7 @@ const sections = [
         <p>Throughout the project, I collaborated with one product manager, one engineer, and one client representative. In the early stages, I participated in workshops for researching, ideating, and evaluating all features of the product. Starting from the wireframe stage, I, along with three other junior designers and one lead, dedicated ourselves to developing the rate comparing feature.</p>
         <p>My contributions included conducting research, forming customer insights & ideation, holding stakeholder meetings, performing usability testing, creating prototypes, and completing the design system.</p>
         <div className="bg-accent/5 rounded-xl p-6 my-6">
-          <p className="font-thicccboi text-xl font-medium tracking-[-0.02em] text-accent mb-2">Post-launch Impact</p>
+          <p className="font-thicccboi text-xl font-bold tracking-[-0.02em] text-accent mb-2">Post-launch Impact</p>
           <p>Increased order value by <strong>100%</strong> and search rate by <strong>62.7%</strong> within three months post-launch.</p>
         </div>
       </SectionText>
@@ -224,7 +224,7 @@ const sections = [
 export default function DrayEasyPage() {
   return (
     <CaseStudyLayout
-      title="DrayEasy"
+      title={<><span className="text-primary font-medium">DrayEasy</span>{" — "}<span className="text-secondary font-semibold">Instant Quotes for Freight</span></>}
       subtitle="Revamping the web platform and empowering freight agent's logistic journey with instant quotes."
       tags={["B2B SaaS", "Transportation", "Logistic Supply Chain", "Launched in 2023"]}
       heroImage="/images/drayeasy/Display.png"

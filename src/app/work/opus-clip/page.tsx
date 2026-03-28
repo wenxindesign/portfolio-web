@@ -64,74 +64,79 @@ function InsightCard({
 
 const sections = [
   {
-    id: "overview",
-    title: "Overview",
+    id: "final-design",
+    title: "Final Design",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
-          The Challenge
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
+          From raw performance data to actionable insights.
         </h3>
-        <p>
-          Content creators on OpusClip could convert long videos into short
-          clips with one click, but had no way to understand{" "}
-          <strong>why some clips performed well while others didn&apos;t</strong>
-          . The platform showed raw metrics without context, leaving creators
-          guessing about what to improve.
-        </p>
-        <p>
-          I was tasked with designing a{" "}
-          <strong>Video Performance Diagnosis tool</strong> — not just another
-          data dashboard, but an AI-powered diagnostic experience that tells
-          creators the &ldquo;why&rdquo; behind their numbers and the
-          &ldquo;how&rdquo; to improve.
+
+        <h4 className="font-thicccboi text-lg font-medium tracking-[-0.01em] text-primary mb-1 !mt-0">
+          1. Identify where viewers drop off
+        </h4>
+        <p className="!mt-0">
+          See how your video actually performed. Understand what happened.
         </p>
 
-        <SectionImage
-          src="/images/opus-clip/overview.jpg"
-          alt="Opus Clip platform overview"
-        />
+        <div className="mt-4 mb-0 w-full overflow-hidden relative" style={{ aspectRatio: '16/7', borderRadius: '12px', background: '#0D0D11' }}>
+          <iframe
+            src="/prototype-01.html"
+            className="border-0"
+            style={{
+              position: 'absolute',
+              width: '1440px',
+              height: '1620px',
+              transformOrigin: '0 0',
+              transform: 'scale(0.85) translate(-320px, -785px)',
+              overflow: 'hidden',
+              pointerEvents: 'none',
+            }}
+            loading="lazy"
+            scrolling="no"
+          />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: '12px', background: 'linear-gradient(to bottom, rgba(13,13,17,0.45) 0%, transparent 12%, transparent 88%, rgba(13,13,17,0.45) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: '12px', background: 'linear-gradient(to right, rgba(13,13,17,0.35) 0%, transparent 8%, transparent 95%, rgba(13,13,17,0.35) 100%)' }} />
+        </div>
 
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
-          My Role
-        </h3>
-        <p>
-          As the <strong>Design Lead Contractor</strong>, I owned the end-to-end
-          UX process — from user research and problem framing to information
-          architecture, wireframes, and hi-fi prototypes. I developed pitch
-          decks for stakeholder reviews and collaborated with PMs and engineers
-          to define MVP scope.
+        <h4 className="font-thicccboi text-lg font-medium tracking-[-0.01em] text-primary mb-1 !mt-10">
+          2. Understand why it happens
+        </h4>
+        <p className="!mt-0">
+          Automatically surface key issues and strengths based on viewer behavior.
         </p>
+
+        <div className="mt-4 mb-0 w-full aspect-[16/10] rounded-2xl bg-[#e5e5e5] flex items-center justify-center">
+          <p className="text-secondary text-sm">Prototype placeholder</p>
+        </div>
+
+        <h4 className="font-thicccboi text-lg font-medium tracking-[-0.01em] text-primary mb-1 !mt-10">
+          3. See performance in context
+        </h4>
+        <p className="!mt-0">
+          Compare performance across your account, similar videos, and platform benchmarks.
+        </p>
+
+        <div className="mt-4 mb-0 w-full aspect-[16/10] rounded-2xl bg-[#e5e5e5] flex items-center justify-center">
+          <p className="text-secondary text-sm">Prototype placeholder</p>
+        </div>
       </SectionText>
     ),
   },
   {
-    id: "problem",
-    title: "Problem Framing",
+    id: "business-trigger",
+    title: "Business Trigger",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
-          Three Layers of Creator Confusion
+        <h3 className="font-thicccboi text-[32px] font-bold tracking-[-0.02em] text-primary mb-3 leading-[1.15]">
+          Video editing is just the beginning. But what do creators need after they publish?
         </h3>
         <p>
-          Through user interviews with 10 content creators across different
-          niches, I identified a three-layer pain point framework (PP3) that
-          revealed the core problem wasn&apos;t about data access — it was about{" "}
-          <strong>diagnostic capability</strong>.
+          As competitors expand into video performance analytics, we began to question whether Opus should evolve beyond editing to drive stronger retention and subscription growth. Editing is no longer the full story.
         </p>
 
-        <div className="space-y-4 mt-6">
-          <InsightCard
-            title="Outcome Confusion"
-            description="Creators could see views and likes, but couldn't understand why the same type of video would get vastly different results. 'My last cooking video got 50K views, this one got 500 — what went wrong?'"
-          />
-          <InsightCard
-            title="Structural Confusion"
-            description="Creators lacked insight into video structure — hook effectiveness, retention patterns, and pacing issues. They couldn't diagnose where viewers were dropping off or why."
-          />
-          <InsightCard
-            title="Contextual Confusion"
-            description="Without benchmarks, creators had no reference point. Is a 45% completion rate good? How does it compare to similar videos or their own historical average?"
-          />
+        <div className="mt-8 w-full aspect-[16/7] rounded-2xl bg-[#e5e5e5] flex items-center justify-center">
+          <p className="text-secondary text-sm">Competitive analysis placeholder</p>
         </div>
       </SectionText>
     ),
@@ -141,7 +146,7 @@ const sections = [
     title: "Research",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
           Competitive Analysis
         </h3>
         <p>
@@ -171,7 +176,7 @@ const sections = [
           />
         </div>
 
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2 mt-8">
           User Insights
         </h3>
         <p>
@@ -194,7 +199,7 @@ const sections = [
     title: "Information Architecture",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
           5-Layer Diagnosis Model
         </h3>
         <p>
@@ -259,7 +264,7 @@ const sections = [
           ))}
         </div>
 
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2 mt-8">
           Two Layout Strategies
         </h3>
         <p>
@@ -295,7 +300,7 @@ const sections = [
     title: "Design Iteration",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
           From Dashboard to Diagnosis Product
         </h3>
         <p>
@@ -326,7 +331,7 @@ const sections = [
           caption="Analyzing the evolution of information hierarchy across wireframe iterations"
         />
 
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2 mt-8">
           MVP Scoping
         </h3>
         <p>
@@ -370,7 +375,7 @@ const sections = [
     title: "Hi-Fi Design",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
           Command Center — Hi-Fi Prototype
         </h3>
         <p>
@@ -387,7 +392,7 @@ const sections = [
           dark
         />
 
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2 mt-8">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2 mt-8">
           Key Design Decisions
         </h3>
 
@@ -441,7 +446,7 @@ const sections = [
     title: "Reflection",
     content: (
       <SectionText>
-        <h3 className="font-thicccboi text-2xl font-medium tracking-[-0.02em] text-primary mb-2">
+        <h3 className="font-thicccboi text-[24px] font-bold tracking-[-0.02em] text-primary mb-2">
           What I Learned
         </h3>
         <p>
@@ -472,7 +477,7 @@ const sections = [
 export default function OpusClipPage() {
   return (
     <CaseStudyLayout
-      title="Opus Clip - From Metrics to Diagnosis"
+      title={<><span className="text-primary font-medium">Opus Clip</span>{" - "}<span className="text-secondary font-semibold">From Metrics to Diagnosis</span></>}
       subtitle="Designing a structured system that helps creators understand performance and improve their videos."
       tags={[
         "B2C AIGC",
@@ -480,13 +485,25 @@ export default function OpusClipPage() {
         "AI Diagnosis Product",
       ]}
       heroImage="/images/opus-clip/hero-mockup.jpg"
+      heroFullBleed
+      heroBgColor="#0B1426"
       sections={sections}
+      atAGlance={
+        <p>
+          As the product designer, I led the design of a <strong className="font-semibold text-primary">performance intelligence system</strong> that redefined how creators optimize content on Opus. Rather than adding more metrics, I reframed the problem as a lack of <strong className="font-semibold text-primary">structured understanding</strong>—introducing a <strong className="font-semibold text-primary">diagnosis model</strong> that connects outcome, structure, and context into <strong className="font-semibold text-primary">actionable insights</strong>. This shifted the product from <strong className="font-semibold text-primary">passive analytics to an active decision-making system</strong>, enabling creators to move from intuition to informed optimization. The solution establishes a scalable foundation for <strong className="font-semibold text-primary">performance-driven workflows</strong> and long-term engagement in a subscription-based ecosystem.
+        </p>
+      }
+      impact={[
+        { number: "+80%", label: "Efficiency" },
+        { number: "2.5x", label: "Decision Making" },
+        { number: "63.3%", label: "Adoption" },
+        { number: "4M+", label: "Scale" },
+      ]}
       sidebar={{
         role: "Design Lead Contractor",
         teammates: [
           "1 PM, 1 Design Lead, 3 Designers",
         ],
-        tools: ["Figma", "Adobe Illustrator"],
         timeline: "Oct 2023 – Mar 2024",
         client: "Opus Clip",
       }}

@@ -1,0 +1,7 @@
+<svg width="200" height="48" viewBox="0 0 200 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Orange arrow/chevron icon -->
+  <path d="M20 8L34 22L28.5 27.5L23.5 22.5V28C23.5 29.933 21.933 31.5 20 31.5C18.067 31.5 16.5 29.933 16.5 28V22.5L11.5 27.5L6 22L20 8Z" fill="#E8550F"/>
+  <ellipse cx="20" cy="33.5" rx="2.5" ry="2.5" fill="#E8550F"/>
+  <!-- Antigma text -->
+  <text x="46" y="33" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="800" letter-spacing="-0.5" fill="#171717">Antigma</text>
+</svg>
