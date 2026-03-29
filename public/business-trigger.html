@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Trigger — Competitive Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: transparent;
+    color: #1A1A1A;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: auto;
+    padding: 8px 0;
+  }
+
+  /* ─── Main layout: table left, cards right ─── */
+  .diagram {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  .diagram-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .diagram-right {
+    width: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ─── The unified table/diagram ─── */
+  .grid {
+    display: grid;
+    grid-template-columns: 130px repeat(3, 1fr);
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  /* ─── Row labels (left column) ─── */
+  .row-label {
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #888;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #F0F0F0;
+    border-right: 1px solid #F0F0F0;
+    background: #FAFAFA;
+  }
+
+  /* Remove bottom border on last row */
+  .grid > *:nth-last-child(-n+4) {
+    border-bottom: none;
+  }
+
+  /* ─── Column headers ─── */
+  .col-header {
+    padding: 16px 12px;
+    text-align: center;
+    border-bottom: 1px solid #E5E5E5;
+    background: #FAFAFA;
+  }
+
+  .col-header:not(:last-child) {
+    border-right: 1px solid #F0F0F0;
+  }
+
+  .col-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 0;
+  }
+
+  /* ─── Corner header ─── */
+  .corner {
+    background: #FAFAFA;
+    border-bottom: 1px solid #E5E5E5;
+    border-right: 1px solid #F0F0F0;
+  }
+
+  /* ─── Data cells ─── */
+  .cell {
+    padding: 12px 12px;
+    text-align: center;
+    border-bottom: 1px solid #F0F0F0;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .cell:not(:nth-child(4n)) {
+    border-right: 1px solid #F0F0F0;
+  }
+
+  /* ─── Gap rows: no inner cell borders ─── */
+  .cell.gap-cell {
+    border-bottom: 1px solid #F0F0F0;
+    border-right: none;
+  }
+
+  .row-label.gap-label {
+    border-bottom: 1px solid #F0F0F0;
+  }
+
+  /* Last row: no bottom border */
+  .grid > *:nth-last-child(-n+4) {
+    border-bottom: none;
+  }
+
+  /* ─── Competitor items (no border, vertical stack) ─── */
+  .competitors-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .comp-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: #555;
+    background: none;
+    border: none;
+    padding: 0;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .comp-pill .brand-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ─── Check / Cross icons ─── */
+  .icon-check {
+    color: #3BA55D;
+    display: inline-flex;
+  }
+
+  .icon-cross {
+    color: #D0D0D0;
+    display: inline-flex;
+  }
+
+  .icon-check svg, .icon-cross svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cell-text {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .cell-text.has { color: #1A1A1A; }
+  .cell-text.missing { color: #C0C0C0; }
+
+  /* ─── Right-side insight cards ─── */
+  .insight-item {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 16px;
+    border-radius: 10px;
+  }
+
+  .insight-gap {
+    background: #FEF6F0;
+    border: 1px solid #F0DCC8;
+  }
+
+  .insight-opp {
+    background: #F0FAF4;
+    border: 1px solid #C3E6D1;
+  }
+
+  .insight-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .insight-gap .insight-icon {
+    background: #E8914D;
+    color: #FFF;
+  }
+
+  .insight-opp .insight-icon {
+    background: #2D8F5E;
+    color: #FFF;
+  }
+
+  .insight-icon svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .insight-text {
+    flex: 1;
+  }
+
+  .insight-text .label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .insight-gap .label { color: #D07A3A; }
+  .insight-opp .label { color: #2D8F5E; }
+
+  .insight-text p {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  /* ─── Animation ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .diagram { animation: fadeIn 0.5s ease both; }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+
+  <!-- Left: Table -->
+  <div class="diagram-left">
+    <div class="grid">
+      <!-- Header row -->
+      <div class="corner"></div>
+      <div class="col-header">
+        <h2>Editing</h2>
+      </div>
+      <div class="col-header">
+        <h2>Analytics</h2>
+      </div>
+      <div class="col-header">
+        <h2>Optimization</h2>
+      </div>
+
+      <!-- Row: Products -->
+      <div class="row-label">Products</div>
+      <div class="cell">
+        <div class="competitors-cell">
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#00CACD"/><path d="M5 4.5v7l6-3.5z" fill="#fff"/></svg>Capcut</span>
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#4263EB"/><path d="M4 5h3v6H4zM9 5h3v6H9z" fill="#fff" rx="0.5"/></svg>Descript</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="competitors-cell">
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#010101"/><path d="M10.3 6.5c.8.5 1.7.8 2.7.8V5.5c-.5 0-1-.1-1.5-.4-.4-.3-.8-.7-1-1.1H9v6.2c0 .7-.6 1.3-1.3 1.3S6.4 10.9 6.4 10.2s.6-1.3 1.3-1.3c.1 0 .3 0 .4.1V7c-1.3 0-2.4 1-2.4 2.3S6.4 11.5 7.7 11.5 10.1 10.5 10.1 9.2V6.5h.2z" fill="#fff"/></svg>TikTok Analytics</span>
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#FF0000"/><path d="M6.5 5.5l4 2.5-4 2.5z" fill="#fff"/></svg>YouTube Studio</span>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="competitors-cell">
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#FF8C00"/><path d="M4 5.5l3 2.5-3 2.5zM8 5.5h4v5H8z" fill="#fff" rx="0.5"/></svg>VidIQ</span>
+          <span class="comp-pill"><svg class="brand-icon" viewBox="0 0 16 16"><rect rx="3" width="16" height="16" fill="#37B24D"/><path d="M4 8l3 3 5-6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>TubeBuddy</span>
+        </div>
+      </div>
+
+      <!-- Row: Core strength -->
+      <div class="row-label">Core Strength</div>
+      <div class="cell">
+        <span class="icon-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cell-text has">Create</span>
+      </div>
+      <div class="cell">
+        <span class="icon-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cell-text has">Measure</span>
+      </div>
+      <div class="cell">
+        <span class="icon-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cell-text has">Suggest</span>
+      </div>
+
+      <!-- Row: Gap 1 — no inner cell borders -->
+      <div class="row-label gap-label">Gap 1</div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">Understand</span>
+      </div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">Explain why</span>
+      </div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">Context-aware</span>
+      </div>
+
+      <!-- Row: Gap 2 — no inner cell borders -->
+      <div class="row-label gap-label">Gap 2</div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">Improve</span>
+      </div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">Guide action</span>
+      </div>
+      <div class="cell gap-cell">
+        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="cell-text missing">End-to-end flow</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Insight cards stacked -->
+  <div class="diagram-right">
+    <div class="insight-item insight-gap">
+      <div class="insight-icon">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 3v3.5M6 8.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="insight-text">
+        <div class="label">Market Gap</div>
+        <p>Fragmented workflow — no tool explains <em>why</em> content performs or guides next steps.</p>
+      </div>
+    </div>
+    <div class="insight-item insight-opp">
+      <div class="insight-icon">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="insight-text">
+        <div class="label">Opportunity</div>
+        <p>A unified diagnosis layer connecting outcomes to causes — turning analytics into decisions.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

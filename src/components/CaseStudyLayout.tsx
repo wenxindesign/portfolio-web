@@ -88,19 +88,17 @@ export default function CaseStudyLayout({
 
       {/* Hero Image */}
       {heroImage && heroFullBleed ? (
-        <section className="w-full" style={{ backgroundColor: heroBgColor || '#0a1628' }}>
-          <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px]">
-            <div className="relative w-full aspect-video">
-              <Image
-                src={heroImage}
-                alt="Case study hero image"
-                fill
-                className="object-contain"
-                sizes="(max-width: 1440px) 100vw, 1200px"
-                priority
-                unoptimized
-              />
-            </div>
+        <section className="w-full overflow-hidden" style={{ backgroundColor: heroBgColor || '#0a1628' }}>
+          <div className="relative w-full" style={{ aspectRatio: '3200/1080' }}>
+            <Image
+              src={heroImage}
+              alt="Case study hero image"
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
+              unoptimized
+            />
           </div>
         </section>
       ) : heroImage ? (

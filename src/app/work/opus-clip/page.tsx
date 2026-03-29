@@ -135,8 +135,13 @@ const sections = [
           As competitors expand into video performance analytics, we began to question whether Opus should evolve beyond editing to drive stronger retention and subscription growth. Editing is no longer the full story.
         </p>
 
-        <div className="mt-8 w-full aspect-[16/7] rounded-2xl bg-[#e5e5e5] flex items-center justify-center">
-          <p className="text-secondary text-sm">Competitive analysis placeholder</p>
+        <div className="mt-4 w-full overflow-hidden">
+          <iframe
+            src="/business-trigger.html"
+            className="w-full border-0"
+            style={{ height: '400px' }}
+            title="Competitive Landscape Diagram"
+          />
         </div>
       </SectionText>
     ),
@@ -486,7 +491,7 @@ export default function OpusClipPage() {
       ]}
       heroImage="/images/opus-clip/hero-mockup.jpg"
       heroFullBleed
-      heroBgColor="#0B1426"
+      heroBgColor="#0D1025"
       sections={sections}
       atAGlance={
         <p>
