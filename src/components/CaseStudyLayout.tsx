@@ -4,6 +4,8 @@ interface Section {
   id: string;
   title: string;
   content: React.ReactNode;
+  fullBleed?: boolean;
+  dark?: boolean;
 }
 
 interface ImpactItem {
@@ -44,6 +46,7 @@ export default function CaseStudyLayout({
   sidebar,
 }: CaseStudyLayoutProps) {
   return (
+    <>
     <div className="min-h-screen relative">
       {/* Sticky Sidebar Nav - fixed to left edge, outside body padding */}
       <aside className="hidden lg:block fixed left-0 top-1/2 -translate-y-1/2 z-40 w-[160px] pl-6">
@@ -68,10 +71,10 @@ export default function CaseStudyLayout({
 
       {/* Hero */}
       <section className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-24 pb-1">
-        <h1 className="font-thicccboi text-5xl md:text-6xl lg:text-7xl tracking-[-0.02em] leading-[1.1] mb-4">
+        <h1 className="font-thicccboi text-4xl md:text-5xl lg:text-[56px] tracking-[-0.025em] leading-[1.08] mb-3">
           {title}
         </h1>
-        <p className="font-thicccboi text-lg md:text-xl lg:text-2xl text-secondary font-normal leading-[1.4] max-w-4xl mb-5">
+        <p className="font-thicccboi text-base md:text-lg lg:text-xl text-secondary font-normal leading-[1.5] max-w-3xl mb-5">
           {subtitle}
         </p>
         <div className="flex flex-wrap gap-3 mb-2">
@@ -118,7 +121,7 @@ export default function CaseStudyLayout({
       ) : null}
 
       {/* Content Area */}
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-16 pb-16">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px] pt-16">
         {/* At-a-Glance */}
         {atAGlance && (
           <div className="mb-8">
@@ -178,16 +181,36 @@ export default function CaseStudyLayout({
           </div>
         )}
 
-        {/* Sections */}
-        {sections.map((section) => (
-          <section key={section.id} id={section.id} className="mt-20 mb-10 scroll-mt-24 first:mt-0">
+      </div>
+    </div>
+
+    {/* Sections - rendered at top level to allow full-bleed */}
+    {sections.map((section) => (
+      section.fullBleed ? (
+        <section
+          key={section.id}
+          id={section.id}
+          className={`w-full scroll-mt-24 ${section.dark ? 'bg-[#1A1A1A]' : 'bg-surface'}`}
+          style={{ marginTop: '120px' }}
+        >
+          <div className="max-w-[1440px] mx-auto px-6 lg:px-[120px] py-16 md:py-20">
+            <h2 className={`font-thicccboi text-[14px] font-bold mb-2 uppercase tracking-wider ${section.dark ? 'text-[#8B7BFF]' : 'text-[#5B3FFF]'}`}>{section.title}</h2>
+            <div className={`prose prose-lg max-w-none leading-[1.6] [&>*:first-child]:mt-0 [&>*:first-child>*:first-child]:mt-0 [&_h3:first-child]:mt-0 ${section.dark ? 'text-white/70 [&_h3]:text-white [&_strong]:text-white [&_p]:text-white/70' : 'text-secondary'}`}>
+              {section.content}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div key={section.id} className="max-w-[1440px] mx-auto px-6 lg:px-[120px]" style={{ marginTop: '120px' }}>
+          <section id={section.id} className="scroll-mt-24">
             <h2 className="font-thicccboi text-[14px] font-bold text-[#5B3FFF] mb-2 uppercase tracking-wider">{section.title}</h2>
             <div className="prose prose-lg max-w-none text-secondary leading-[1.6] [&>*:first-child]:mt-0 [&>*:first-child>*:first-child]:mt-0 [&_h3:first-child]:mt-0">
               {section.content}
             </div>
           </section>
-        ))}
-      </div>
-    </div>
+        </div>
+      )
+    ))}
+    </>
   );
 }

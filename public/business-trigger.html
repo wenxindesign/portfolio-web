@@ -19,7 +19,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     min-height: auto;
-    padding: 8px 0;
+    padding: 0;
   }
 
   /* ─── Main layout: table left, cards right ─── */
@@ -248,6 +248,10 @@
     line-height: 1.5;
   }
 
+  .insight-text p strong {
+    color: #1A1A1A;
+  }
+
   /* ─── Animation ─── */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(12px); }
@@ -313,32 +317,32 @@
       </div>
 
       <!-- Row: Gap 1 — no inner cell borders -->
-      <div class="row-label gap-label">Gap 1</div>
+      <div class="row-label gap-label">Missing</div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">Understand</span>
       </div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">Explain why</span>
       </div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">Context-aware</span>
       </div>
 
       <!-- Row: Gap 2 — no inner cell borders -->
-      <div class="row-label gap-label">Gap 2</div>
+      <div class="row-label gap-label">Missing</div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">Improve</span>
       </div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">Guide action</span>
       </div>
       <div class="cell gap-cell">
-        <span class="icon-cross"><svg viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+
         <span class="cell-text missing">End-to-end flow</span>
       </div>
     </div>
@@ -352,7 +356,7 @@
       </div>
       <div class="insight-text">
         <div class="label">Market Gap</div>
-        <p>Fragmented workflow — no tool explains <em>why</em> content performs or guides next steps.</p>
+        <p>An opportunity to <strong>unify editing, analytics, and optimization</strong> into a single system that helps creators move from <strong>data → insight → action</strong>.</p>
       </div>
     </div>
     <div class="insight-item insight-opp">
@@ -361,12 +365,21 @@
       </div>
       <div class="insight-text">
         <div class="label">Opportunity</div>
-        <p>A unified diagnosis layer connecting outcomes to causes — turning analytics into decisions.</p>
+        <p><strong>Optimization should extend beyond editing</strong> — into a continuous workflow</p>
       </div>
     </div>
   </div>
 
 </div>
 
+<script>
+  // Auto-resize: tell parent the exact content height
+  function sendHeight() {
+    var h = document.querySelector('.diagram').offsetHeight;
+    parent.postMessage({ diagramHeight: h }, '*');
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+</script>
 </body>
 </html>

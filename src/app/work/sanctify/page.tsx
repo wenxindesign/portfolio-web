@@ -232,7 +232,7 @@ const sections = [
 export default function SanctifyPage() {
   return (
     <CaseStudyLayout
-      title={<><span className="text-primary font-medium">Sanctify</span>{" — "}<span className="text-secondary font-semibold">Faith-Based Investing</span></>}
+      title={<><span className="text-primary font-semibold">Sanctify</span><br /><span className="text-secondary font-normal">Faith-Based Investing</span></>}
       subtitle="Launching a convenient and delightful investment app that lets you make well-informed decisions in line with Catholic values."
       tags={["B2C Fintech", "Award winning", "Launched in 2023"]}
       heroImage="/images/sanctify/Display.png"

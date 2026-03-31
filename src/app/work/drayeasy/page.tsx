@@ -224,7 +224,7 @@ const sections = [
 export default function DrayEasyPage() {
   return (
     <CaseStudyLayout
-      title={<><span className="text-primary font-medium">DrayEasy</span>{" — "}<span className="text-secondary font-semibold">Instant Quotes for Freight</span></>}
+      title={<><span className="text-primary font-semibold">DrayEasy</span><br /><span className="text-secondary font-normal">Instant Quotes for Freight</span></>}
       subtitle="Revamping the web platform and empowering freight agent's logistic journey with instant quotes."
       tags={["B2B SaaS", "Transportation", "Logistic Supply Chain", "Launched in 2023"]}
       heroImage="/images/drayeasy/Display.png"
