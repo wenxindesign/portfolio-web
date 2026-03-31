@@ -80,16 +80,16 @@ const sections = [
           See how your video actually performed. Understand what happened.
         </p>
 
-        <div className="mt-4 mb-0 w-full overflow-hidden relative" style={{ aspectRatio: '16/7', borderRadius: '12px', background: '#0D0D11' }}>
+        <div className="mt-4 mb-0 w-full overflow-hidden relative" style={{ aspectRatio: '16/9', borderRadius: '12px', background: '#0D0D11' }}>
           <iframe
             src="/prototype-01.html"
-            className="border-0"
+            className="border-0 w-full"
             style={{
               position: 'absolute',
-              width: '1440px',
-              height: '1620px',
-              transformOrigin: '0 0',
-              transform: 'scale(0.85) translate(-320px, -785px)',
+              height: '1600px',
+              top: '-620px',
+              left: '-7.5%',
+              width: '115%',
               overflow: 'hidden',
               pointerEvents: 'none',
             }}
@@ -154,11 +154,14 @@ const sections = [
           Problems do exist across the lifecycle
         </h3>
         <p>
-          We conducted surveys and mapped user journeys, tracing pain points across every step of the video creation lifecycle. We found that many user frustrations exist beyond the current feature set.
+          We conducted 10 surveys and mapped the full user journey, tracing pain points across every step of the video creation lifecycle. We found that many user frustrations exist beyond the current feature set. The pain points fall into three major categories, spanning the early and late stages of the user journey.
         </p>
 
-        <div className="mt-8 w-full aspect-[16/9] rounded-2xl bg-[#e5e5e5] flex items-center justify-center">
-          <p className="text-secondary text-sm">User research placeholder</p>
+        <div className="mt-8 w-full">
+          <AutoIframe
+            src="/card-sorting.html"
+            title="Pain Point Card Sorting Diagram"
+          />
         </div>
 
       </SectionText>
@@ -172,7 +175,7 @@ const sections = [
     content: (
       <SectionText>
         <p>
-          While the lifecycle presented three opportunities, I focused this case study on PP3 — Post-publishing diagnosis. We reframed Opus as a video optimization system.
+          While the lifecycle presented three opportunities, I focused this case study on PP3 — Post-publishing diagnosis.
         </p>
         <h3 className="font-thicccboi text-[28px] font-bold tracking-[-0.02em] mt-4 mb-0 leading-[1.2]">
           How might we help creators make sense of performance data and take action to improve their videos after publishing?

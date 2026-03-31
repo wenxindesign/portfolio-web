@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User Research — Pain Point Card Sorting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: transparent;
+    color: #1A1A1A;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 0;
+    min-height: auto;
+  }
+
+  /* ─── Main container ─── */
+  .diagram {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: fadeIn 0.5s ease both;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid #E5E5E5;
+  }
+
+  /* ─── Phase header row ─── */
+  .phase-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  .phase-label-cell {
+    background: #1A1A1A;
+    color: #fff;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+  }
+
+  .phase-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .phase-header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #1A1A1A;
+  }
+
+  .phase-pre {
+    background: #F5F3FF;
+    border-right: 1px solid #E5E5E5;
+  }
+
+  .phase-post {
+    background: #FFF5F0;
+  }
+
+  /* ─── Core Problem row ─── */
+  .core-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 0;
+  }
+
+  .core-label {
+    background: #FAFAFA;
+    padding: 16px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    display: flex;
+    align-items: flex-start;
+    border-right: 1px solid #F0F0F0;
+    border-bottom: 1px solid #E5E5E5;
+    border-left: 1px solid #E5E5E5;
+  }
+
+  .core-cards {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid #E5E5E5;
+    border-right: 1px solid #E5E5E5;
+  }
+
+  .core-card {
+    flex: 1;
+    padding: 16px 14px;
+    border-radius: 8px;
+    min-height: 80px;
+  }
+
+  .core-card.red {
+    background: #E85454;
+    color: #fff;
+  }
+
+  .core-card.purple {
+    background: #7C5CFC;
+    color: #fff;
+  }
+
+  .core-card .pp-tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    opacity: 0.85;
+  }
+
+  .core-card .pp-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  .core-card.purple .pp-tag {
+    opacity: 1;
+  }
+
+  /* ─── Sub pain points row ─── */
+  .sub-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 0;
+  }
+
+  .sub-label {
+    background: #FAFAFA;
+    padding: 16px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    display: flex;
+    align-items: flex-start;
+    border-right: 1px solid #F0F0F0;
+    border-bottom: none;
+  }
+
+  .sub-cards-group {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .sub-cards-group:last-child {
+  }
+
+  .sub-column {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+
+  .sub-card {
+    background: #FFE082;
+    border: none;
+    border-radius: 2px;
+    padding: 10px 10px;
+    font-size: 11px;
+    color: #3E2C00;
+    line-height: 1.4;
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sub-card:nth-child(2) { background: #FFD54F; }
+  .sub-card:nth-child(3) { background: #FFE082; }
+  .sub-card:nth-child(4) { background: #FFD54F; }
+  .sub-card:nth-child(5) { background: #FFE082; }
+
+  .sub-card .priority {
+    font-size: 9px;
+    font-weight: 600;
+    color: #B8A040;
+    letter-spacing: 0.03em;
+    margin-bottom: 3px;
+  }
+
+  .sub-card.highlight {
+    background: #D1C4E9;
+  }
+
+  .sub-card.highlight:nth-child(2) { background: #B39DDB; }
+  .sub-card.highlight:nth-child(3) { background: #D1C4E9; }
+  .sub-card.highlight:nth-child(4) { background: #B39DDB; }
+  .sub-card.highlight:nth-child(5) { background: #D1C4E9; }
+
+  .sub-card.highlight .priority {
+    color: #7C5CFC;
+  }
+
+  /* ─── Focused indicator ─── */
+  .focus-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #D4836B;
+    background: #FEF0EB;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+
+  .focus-badge svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* ─── Animation ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="diagram">
+
+  <!-- Phase header row -->
+  <div class="phase-row">
+    <div class="phase-label-cell">Product<br>Scope to<br>Expand</div>
+    <div class="phase-header phase-pre">
+      <h2>Pre-editing: Ideation Process</h2>
+    </div>
+    <div class="phase-header phase-post">
+      <h2>Post-publishing: Evaluation</h2>
+    </div>
+  </div>
+
+  <!-- Core Problem row -->
+  <div class="core-row">
+    <div class="core-label">Core Problem</div>
+    <div class="core-cards">
+      <div class="core-card red">
+        <div class="pp-tag">PP1:</div>
+        <div class="pp-title">Unable to predict market trends and audience preferences</div>
+      </div>
+      <div class="core-card red">
+        <div class="pp-tag">PP2:</div>
+        <div class="pp-title">Lack of content creation optimization strategies and suggestions</div>
+      </div>
+    </div>
+    <div class="core-cards">
+      <div class="core-card purple">
+        <div class="pp-tag">PP3:</div>
+        <div class="pp-title">Don't know if published videos are actually effective</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub pain points row -->
+  <div class="sub-row">
+    <div class="sub-label">Sub Pain<br>Points</div>
+    <div class="sub-cards-group">
+      <!-- PP1 sub points -->
+      <div class="sub-column">
+        <div class="sub-card">
+
+          Hard to choose trending topics that reliably attract traffic
+        </div>
+        <div class="sub-card">
+
+          Can't predict which content the algorithm will recommend
+        </div>
+        <div class="sub-card">
+
+          Want to understand competitors' content strategy and performance in the same niche
+        </div>
+        <div class="sub-card">
+
+          Expect data-driven guidance for content direction and ad targeting
+        </div>
+        <div class="sub-card">
+
+          Need better understanding of platform algorithm rules before publishing
+        </div>
+      </div>
+      <!-- PP2 sub points -->
+      <div class="sub-column">
+        <div class="sub-card">
+
+          Script creation feels too generic; finding good references takes too much time
+        </div>
+        <div class="sub-card">
+
+          Current tools don't provide content-level optimization suggestions
+        </div>
+        <div class="sub-card">
+
+          Want template or structure recommendations based on video type and audience
+        </div>
+        <div class="sub-card">
+
+          Need a structured storyboard workflow with references to reduce guesswork
+        </div>
+        <div class="sub-card">
+
+          Need AI-assisted prompts to help generate and refine content ideas faster
+        </div>
+      </div>
+    </div>
+    <div class="sub-cards-group">
+      <!-- PP3 sub points -->
+      <div class="sub-column">
+        <div class="sub-card highlight">
+
+          Lack detailed analytics about target audience and video performance
+        </div>
+        <div class="sub-card highlight">
+
+          Can't tell which editing choices drove good or bad performance
+        </div>
+        <div class="sub-card highlight">
+
+          Hard to benchmark against similar creators or platform averages
+        </div>
+        <div class="sub-card highlight">
+
+          No feedback loop connecting performance data back to the next video
+        </div>
+        <div class="sub-card highlight">
+
+          Data exists but is scattered across platforms with no unified view
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function sendHeight() {
+    var el = document.querySelector('.diagram');
+    var rect = el.getBoundingClientRect();
+    parent.postMessage({ diagramHeight: Math.ceil(rect.height) }, '*');
+  }
+  window.addEventListener('load', function() {
+    sendHeight();
+    setTimeout(sendHeight, 100);
+    setTimeout(sendHeight, 500);
+  });
+  window.addEventListener('resize', sendHeight);
+</script>
+</body>
+</html>
